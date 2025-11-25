@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nfc_manager/nfc_manager.dart';
-import 'package:ota_update/ota_update.dart';
 import 'package:production/Screens/Route/RouteScreenforincharge.dart';
 import 'package:production/Screens/Route/RouteScreenfordriver.dart';
 import 'package:production/Screens/Route/RouteScreenforAgent.dart';
@@ -157,114 +156,7 @@ class _LoginscreenState extends State<Loginscreen> {
     }
   }
 
-  Future<void> startOtaUpdate(String apkUrl) async {
-    try {
-      final completer = Completer<void>();
 
-      OtaUpdate()
-          .execute(apkUrl, destinationFilename: 'myapp-latest.apk')
-          .listen(
-            (OtaEvent event) {
-          // Handle OTA update events here if needed
-          print('OTA Event: ${event.status} - ${event.value}');
-
-          // Complete when download finishes (successful or not)
-          if (event.status.toString().contains('DOWNLOAD') &&
-              event.value == '100.0') {
-            completer.complete();
-          }
-        },
-        onError: (error) {
-          print('OTA Update error: $error');
-          completer.completeError(error);
-        },
-        onDone: () {
-          if (!completer.isCompleted) {
-            completer.complete();
-          }
-        },
-      );
-
-      // Wait for the OTA update to complete
-      await completer.future;
-    } catch (e) {
-      print('OTA Update failed: $e');
-      rethrow;
-    }
-  }
-
-  Future<bool> _showUpdateDialog(BuildContext context, String message,
-      int updateTypeId, String apppath) async {
-    // Returns true if Update pressed, false if Later pressed
-    bool isLoading = false;
-
-    final result = await showDialog<bool>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => StatefulBuilder(
-        builder: (context, setDialogState) {
-          Widget dialog = AlertDialog(
-            title: const Text("Update Available"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(message),
-                if (isLoading) ...[
-                  const SizedBox(height: 20),
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 10),
-                  const Text("Downloading update..."),
-                ],
-              ],
-            ),
-            actions: isLoading
-                ? []
-                : [
-              if (updateTypeId != 1)
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context, false); // Later pressed
-                  },
-                  child: const Text("Later"),
-                ),
-              TextButton(
-                onPressed: () async {
-                  setDialogState(() {
-                    isLoading = true;
-                  });
-
-                  try {
-                    await startOtaUpdate(apppath);
-                    Navigator.pop(
-                        context, true); // Update pressed and completed
-                  } catch (e) {
-                    setDialogState(() {
-                      isLoading = false;
-                    });
-                    // Show error message
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Update failed: $e')),
-                    );
-                  }
-                },
-                child: const Text("Update"),
-              ),
-            ],
-          );
-          // Prevent back button if only Update is shown
-          if (updateTypeId == 1) {
-            return WillPopScope(
-              onWillPop: () async => false,
-              child: dialog,
-            );
-          } else {
-            return dialog;
-          }
-        },
-      ),
-    );
-    return result == true;
-  }
 
   // Save login data to SQLite (ONLY if table is empty - first user only)
   Future<void> saveLoginData() async {
@@ -679,9 +571,6 @@ class _LoginscreenState extends State<Loginscreen> {
           'VPTEMPLATEID': baseurlresult?['vptemplteID']?.toString() ?? '',
           'VMETID':
           'jcd3r0UZg4FnqnFKCfAZqwj+d5Y7TJhxN6vIvKsoJIT++90iKP3dELmti79Q+W7aVywvVbhfoF5bdW32p33PbRRTT27Jt3pahRrFzUe5s0jQBoeE0jOraLITDQ6RBv0QoscoOGxL7n0gEWtLE15Bl/HSF2kG5pQYft+ZyF4DNsLf7tGXTz+w/30bv6vMTGmwUIDWqbEet/+5AAjgxEMT/G4kiZifX0eEb3gMxycdMchucGbMkhzK+4bvZKmIjX+z6uz7xqb1SMgPnjKmoqCk8w833K9le4LQ3KSYkcVhyX9B0Q3dDc16JDtpEPTz6b8rTwY8puqlzfuceh5mWogYuA==',
-          'APPNAME': 'Cinefo Driver',
-          // 'APPNAME': 'Cinefo Agent',
-          'APPVERSION': packageInfo.version
         },
         body: jsonEncode(<String, dynamic>{
           "mobileNumber": loginmobilenumber.text,
@@ -729,43 +618,6 @@ class _LoginscreenState extends State<Loginscreen> {
 
           if (responseBody['vsid'] != null) {
             print("📊 VSID: ${responseBody['vsid']}");
-          }
-          if (responseBody.keys.toList().contains('updateTypeId')) {
-            int updateTypeId = responseBody['updateTypeId'];
-            String apppath = responseBody['appPath'];
-            String updateMessage = "new version is there please update app";
-            bool didUpdate = await _showUpdateDialog(
-                context, updateMessage, updateTypeId, apppath);
-            print('updateTypeId is there 📊 📊 📊 📊 📊 📊 📊 📊 📊 📊');
-            // Only navigate after dialog is handled
-            if (didUpdate || updateTypeId != 1) {
-              if (mounted) {
-                // Only restrict navigation if NOT a driver (9) or agent (18)
-                if (responseBody['unitid'] != 9 && responseBody['unitid'] != 18) {
-                  // Show dialog for unauthorized users
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('Access Denied'),
-                        content: Text('You are not authorized to use this app'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              }
-            }
-          } else {
-            print('updateTypeId is not there  📊 📊 📊 📊 📊 📊 📊 📊 📊 📊');
           }
 
           if (responseBody != null && responseBody['responseData'] != null) {
