@@ -7,6 +7,8 @@ import 'package:production/Screens/Login/loginscreen.dart';
 import 'package:production/Screens/Route/RouteScreenfordriver.dart';
 import 'package:production/Screens/Route/RouteScreenforincharge.dart';
 
+import '../../service/update_service.dart';
+
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -20,6 +22,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _initializeSplashScreen();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.forceUpdate();
+    });
   }
 
   Future<void> _initializeSplashScreen() async {
