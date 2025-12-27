@@ -1,24 +1,50 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:production/variables.dart';
-
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart' as path;
+import 'package:production/variables.dart';
 // Function to update trip status
+
+Future<void> fetchloginDataFromSqlite() async {
+  try {
+    final dbPath = path.join(await getDatabasesPath(), 'production_login.db');
+    final Database db = await openDatabase(dbPath);
+
+    final List<Map<String, dynamic>> rows = await db.query(
+      'login_data',
+      orderBy: 'id ASC',
+      limit: 1,
+    );
+    final Map<String, dynamic> first = rows.first;
+    if (first['production_type_id'] is int) {
+      print("❌❌❌❌❌❌ int");
+    } else {
+      print("❌❌❌❌❌❌ String");
+    }
+    productionTypeId = first['production_type_id'] ?? 0;
+    vmid = first['vmid'];
+    unitid = first['unitid'];
+    projectId = first['project_id'];
+    vsid = first['vsid'];
+  } catch (e) {
+    print('❌ Error fetching productionTypeId from SQLite: $e');
+  }
+}
+
 Future<Map<String, dynamic>> driverreportapi({
   required int vmid,
   required int unitid,
   required String vsid,
 }) async {
   try {
-    final payload = {
-    "unitid": unitid,
-    "vmid":vmid
-    };
+    final payload = {"unitid": unitid, "vmid": vmid};
     final tripstatusresponse = await http.post(
       processSessionRequest,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'VMETID':
-        'VtHdAOR3ljcro4U+M9+kByyNPjr8d/b3VNhQmK9lwHYmkC5cUmqkmv6Ku5FFOHTYi9W80fZoAGhzNSB9L/7VCTAfg9S2RhDOMd5J+wkFquTCikvz38ZUWaUe6nXew/NSdV9K58wL5gDAd/7W0zSOpw7Qb+fALxSDZ8UmWdk7MxLkZDn0VIHwVAgv13JeeZVivtG7gu0DJvTyPixMJUFCQzzADzJHoIYtgXV4342izgfc4Lqca4rdjVwYV79/LLqmz1M8yAWXqfSRb+ArLo6xtPrjPInGZcIO8U6uTH1WmXvw+pk3xKD/WEEAFk69w8MI1TrntrzGgDPZ21NhqZXE/w==',
+            'VtHdAOR3ljcro4U+M9+kByyNPjr8d/b3VNhQmK9lwHYmkC5cUmqkmv6Ku5FFOHTYi9W80fZoAGhzNSB9L/7VCTAfg9S2RhDOMd5J+wkFquTCikvz38ZUWaUe6nXew/NSdV9K58wL5gDAd/7W0zSOpw7Qb+fALxSDZ8UmWdk7MxLkZDn0VIHwVAgv13JeeZVivtG7gu0DJvTyPixMJUFCQzzADzJHoIYtgXV4342izgfc4Lqca4rdjVwYV79/LLqmz1M8yAWXqfSRb+ArLo6xtPrjPInGZcIO8U6uTH1WmXvw+pk3xKD/WEEAFk69w8MI1TrntrzGgDPZ21NhqZXE/w==',
         'VSID': vsid,
       },
       body: jsonEncode(payload),
@@ -27,7 +53,8 @@ Future<Map<String, dynamic>> driverreportapi({
     print(
         '🚗 driverreportapi Status API Response Status: ${tripstatusresponse.statusCode}');
     print('🚗 driverreportapi Status API Response Status: ${payload}');
-    print('🚗 driverreportapi Status API Response Body: ${tripstatusresponse.body}');
+    print(
+        '🚗 driverreportapi Status API Response Body: ${tripstatusresponse.body}');
 
     return {
       'statusCode': tripstatusresponse.statusCode,
@@ -43,43 +70,46 @@ Future<Map<String, dynamic>> driverreportapi({
     };
   }
 }
-  Future<Map<String, dynamic>> otpupdateapi({
-    required String otp,
-    required int tripid,
-    required String vsid,
-  }) async {
-    try {
-      final payload = {"otp": otp, "tripid": tripid};
-      final tripstatusresponse = await http.post(
-        processSessionRequest,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'VMETID':
-          'QgVDrPhlWrDKmna6XTWerKXWfIod6JruEjC1ZF34o0gGV+B0KRmpCzmEORTzVacdYBA91w99nrhEa1Gd5737LvAs5gepXBCNUTbMmzgPwm6rA/D76Zg0V43bWafhalAf70Q3pxJ5hLFHN6yIzKMsrj1aqc7DihVwrdIs2hsM5mTcWKBk3kdbLbbvClJiw7HKLhUr5G2jNbzoKkwGeiZ3ywN+g2zv4d5edQteQ4Lz6f5Egu9hFOut8t3bkTaAWeraSpXgNwKWBDitc/KcRN3SGikhgWV3gTI5BFSPVB8H1Gdck6p3hUCHGTlk/aN80p4lZTRi8RByB9ebSxT5Qdo7KQ==',
-          'VSID': vsid,
-        },
-        body: jsonEncode(payload),
-      );
 
-      print(
-          '🚗 otpupdateapi Status API Response Status: ${tripstatusresponse.statusCode}');
-      print('🚗 otpupdateapi Status API Response Status: ${payload}');
-      print('🚗 otpupdateapi Status API Response Body: ${tripstatusresponse.body}');
+Future<Map<String, dynamic>> otpupdateapi({
+  required String otp,
+  required int tripid,
+  required String vsid,
+}) async {
+  try {
+    final payload = {"otp": otp, "tripid": tripid};
+    final tripstatusresponse = await http.post(
+      processSessionRequest,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'VMETID':
+            'QgVDrPhlWrDKmna6XTWerKXWfIod6JruEjC1ZF34o0gGV+B0KRmpCzmEORTzVacdYBA91w99nrhEa1Gd5737LvAs5gepXBCNUTbMmzgPwm6rA/D76Zg0V43bWafhalAf70Q3pxJ5hLFHN6yIzKMsrj1aqc7DihVwrdIs2hsM5mTcWKBk3kdbLbbvClJiw7HKLhUr5G2jNbzoKkwGeiZ3ywN+g2zv4d5edQteQ4Lz6f5Egu9hFOut8t3bkTaAWeraSpXgNwKWBDitc/KcRN3SGikhgWV3gTI5BFSPVB8H1Gdck6p3hUCHGTlk/aN80p4lZTRi8RByB9ebSxT5Qdo7KQ==',
+        'VSID': vsid,
+      },
+      body: jsonEncode(payload),
+    );
 
-      return {
-        'statusCode': tripstatusresponse.statusCode,
-        'body': tripstatusresponse.body,
-        'success': tripstatusresponse.statusCode == 200,
-      };
-    } catch (e) {
-      print('❌ Error in tripstatusapi: $e');
-      return {
-        'statusCode': 0,
-        'body': 'Error: $e',
-        'success': false,
-      };
-    }
+    print(
+        '🚗 otpupdateapi Status API Response Status: ${tripstatusresponse.statusCode}');
+    print('🚗 otpupdateapi Status API Response Status: ${payload}');
+    print(
+        '🚗 otpupdateapi Status API Response Body: ${tripstatusresponse.body}');
+
+    return {
+      'statusCode': tripstatusresponse.statusCode,
+      'body': tripstatusresponse.body,
+      'success': tripstatusresponse.statusCode == 200,
+    };
+  } catch (e) {
+    print('❌ Error in tripstatusapi: $e');
+    return {
+      'statusCode': 0,
+      'body': 'Error: $e',
+      'success': false,
+    };
   }
+}
+
 Future<Map<String, dynamic>> lookupcallsheetnotforattendenceapi({
   required int projectid,
   required String vsid,
@@ -91,7 +121,7 @@ Future<Map<String, dynamic>> lookupcallsheetnotforattendenceapi({
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'VMETID':
-        'RxvjE+jpr7/hdMwDmyDIz5+FC3qCCTJfmFVMypvuabzCRU/uge/pTo80n0qeb1J+XPjQ/JulyZ/5ufuiPOEQ9xm84PHIeHYz3dXvNCuuyFYO1Vfpq4B79KHm5kEbv5M3YvEn7YSUoetwT0mnNMUJUB1zwDNoOxCk7MQ7+71CXlphHDn/O5Nx1klD0Pc/LlDdZmwV2WcKWRvNgvlllG3eAVuVO8A4ng0mR14Rr/lfJfK0wxH7xu/9UShGk5529kKcRYtndqTr4CgCozRTInR1cIUbkKoeCCbdykcuVmEY8h23UatlRLGUsD9FJXRioRmOo9hKOgtk9FxC1qoJhV+x+g==',
+            'RxvjE+jpr7/hdMwDmyDIz5+FC3qCCTJfmFVMypvuabzCRU/uge/pTo80n0qeb1J+XPjQ/JulyZ/5ufuiPOEQ9xm84PHIeHYz3dXvNCuuyFYO1Vfpq4B79KHm5kEbv5M3YvEn7YSUoetwT0mnNMUJUB1zwDNoOxCk7MQ7+71CXlphHDn/O5Nx1klD0Pc/LlDdZmwV2WcKWRvNgvlllG3eAVuVO8A4ng0mR14Rr/lfJfK0wxH7xu/9UShGk5529kKcRYtndqTr4CgCozRTInR1cIUbkKoeCCbdykcuVmEY8h23UatlRLGUsD9FJXRioRmOo9hKOgtk9FxC1qoJhV+x+g==',
         'VSID': vsid,
       },
       body: jsonEncode(payload),
@@ -99,8 +129,10 @@ Future<Map<String, dynamic>> lookupcallsheetnotforattendenceapi({
 
     print(
         '🚗 lookupcallsheetnotforattendenceapi Status API Response Status: ${tripstatusresponse.statusCode}');
-    print('🚗 lookupcallsheetnotforattendenceapi Status API Response Status: ${payload}');
-    print('🚗 lookupcallsheetnotforattendenceapi Status API Response Body: ${tripstatusresponse.body}');
+    print(
+        '🚗 lookupcallsheetnotforattendenceapi Status API Response Status: ${payload}');
+    print(
+        '🚗 lookupcallsheetnotforattendenceapi Status API Response Body: ${tripstatusresponse.body}');
 
     return {
       'statusCode': tripstatusresponse.statusCode,
@@ -116,12 +148,12 @@ Future<Map<String, dynamic>> lookupcallsheetnotforattendenceapi({
     };
   }
 }
+
 Future<Map<String, dynamic>> tripupdatedstatusapi({
   required Map<String, dynamic> payload,
   required String vsid,
 }) async {
   try {
-
     final tripstatusresponse = await http.post(
       processSessionRequest,
       headers: <String, String>{
@@ -324,19 +356,19 @@ Future<Map<String, dynamic>> lookupcallsheetapi({
     };
   }
 }
+
 Future<Map<String, dynamic>> approvalofproductionmanagerapi({
   required int callsheetstatusid,
   required String vsid,
 }) async {
   try {
-    final payload =
-      {"callsheetstatusid" : callsheetstatusid };
+    final payload = {"callsheetstatusid": callsheetstatusid};
     final approvalofproductionmanagerapiresponse = await http.post(
       processSessionRequest,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'VMETID':
-        'AuTfNLu/i8GSX5lxhYSrebOJkF9rnTYZEXm43WWlv6Wg2KRtTekVOni0DtEa1OP2UwPvw+dgyxKzwMGT8AttQboO8v3yWhzO7ecXNAoyDCLOeQDtRYzfiYwY3GN4hN5npc58tr6Jdd8iWnKy1ZhSJ7Nm7+Zgh2BP15u6sQVjpdqHBJTL0nxx6rdyjVYURSCU0FvXDiqzsbx+C1lZHiX0YGJb+IXFnPzl0lgZO/3FMbo21tVUfGnh0D19DPLVyggAyic+MMUK1Ld9mBRhvijnJoI86f44Us9NrLfQ+b4klTit0LL37PWKaJmdQ348psfMwzImm0FSiudDD1N1ttZqVg==',
+            'AuTfNLu/i8GSX5lxhYSrebOJkF9rnTYZEXm43WWlv6Wg2KRtTekVOni0DtEa1OP2UwPvw+dgyxKzwMGT8AttQboO8v3yWhzO7ecXNAoyDCLOeQDtRYzfiYwY3GN4hN5npc58tr6Jdd8iWnKy1ZhSJ7Nm7+Zgh2BP15u6sQVjpdqHBJTL0nxx6rdyjVYURSCU0FvXDiqzsbx+C1lZHiX0YGJb+IXFnPzl0lgZO/3FMbo21tVUfGnh0D19DPLVyggAyic+MMUK1Ld9mBRhvijnJoI86f44Us9NrLfQ+b4klTit0LL37PWKaJmdQ348psfMwzImm0FSiudDD1N1ttZqVg==',
         'VSID': vsid,
       },
       body: jsonEncode(payload),
@@ -344,8 +376,10 @@ Future<Map<String, dynamic>> approvalofproductionmanagerapi({
 
     print(
         '🚗 approvalofproductionmanagerapiresponse Status API Response Status: ${approvalofproductionmanagerapiresponse.statusCode}');
-    print('🚗 approvalofproductionmanagerapiresponse Status API Response Status: ${payload}');
-    print('🚗 approvalofproductionmanagerapiresponse Status API Response Body: ${approvalofproductionmanagerapiresponse.body}');
+    print(
+        '🚗 approvalofproductionmanagerapiresponse Status API Response Status: ${payload}');
+    print(
+        '🚗 approvalofproductionmanagerapiresponse Status API Response Body: ${approvalofproductionmanagerapiresponse.body}');
 
     return {
       'statusCode': approvalofproductionmanagerapiresponse.statusCode,
@@ -367,16 +401,13 @@ Future<Map<String, dynamic>> approvalofproductionmanager2api({
   required String vsid,
 }) async {
   try {
-    final payload =
-    {
-      "callsheetid": callsheetid
-    };
+    final payload = {"callsheetid": callsheetid};
     final approvalofproductionmanagerapiresponse = await http.post(
       processSessionRequest,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'VMETID':
-        'LE/EOR30OyNb4E+Kjz45gOazQ6yGMNGd8evS7UqbbZZ3ECwNSBhBziffuiq4Et9kJAZmOVlCIpsaVLuFLTGzaObCpvyDQNACvFTGv/+T93SLNnPZ91xpMjigvv25FmErk24nSx8Y0L3Xo9wNJVFQn58DDdMPMxMuOdrYhUR/kXAMv09yxapmyaDhzxuNA26lF/1yiyczN/eu8n17qhZ0a6uk9VJzYwwHOJBCHrTsoccP4DQBzmu3NB71KunvzmlqexGgToiRLg47h75DV3WSafVQvk9vLL9G7ZxYiBrJM1hg6fST8NazX40BwrtC6herXnEjQHpHwYOQtH+UMr4J7A==',
+            'LE/EOR30OyNb4E+Kjz45gOazQ6yGMNGd8evS7UqbbZZ3ECwNSBhBziffuiq4Et9kJAZmOVlCIpsaVLuFLTGzaObCpvyDQNACvFTGv/+T93SLNnPZ91xpMjigvv25FmErk24nSx8Y0L3Xo9wNJVFQn58DDdMPMxMuOdrYhUR/kXAMv09yxapmyaDhzxuNA26lF/1yiyczN/eu8n17qhZ0a6uk9VJzYwwHOJBCHrTsoccP4DQBzmu3NB71KunvzmlqexGgToiRLg47h75DV3WSafVQvk9vLL9G7ZxYiBrJM1hg6fST8NazX40BwrtC6herXnEjQHpHwYOQtH+UMr4J7A==',
         'VSID': vsid,
       },
       body: jsonEncode(payload),
@@ -384,8 +415,10 @@ Future<Map<String, dynamic>> approvalofproductionmanager2api({
 
     print(
         '🚗 approvalofproductionmanagerapiresponse Status API Response Status: ${approvalofproductionmanagerapiresponse.statusCode}');
-    print('🚗 approvalofproductionmanagerapiresponse Status API Response Status: ${payload}');
-    print('🚗 approvalofproductionmanagerapiresponse Status API Response Body: ${approvalofproductionmanagerapiresponse.body}');
+    print(
+        '🚗 approvalofproductionmanagerapiresponse Status API Response Status: ${payload}');
+    print(
+        '🚗 approvalofproductionmanagerapiresponse Status API Response Body: ${approvalofproductionmanagerapiresponse.body}');
 
     return {
       'statusCode': approvalofproductionmanagerapiresponse.statusCode,

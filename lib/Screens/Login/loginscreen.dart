@@ -4,8 +4,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nfc_manager/nfc_manager.dart';
-import 'package:production/Screens/Route/RouteScreenforincharge.dart';
-import 'package:production/Screens/Route/RouteScreenfordriver.dart';
 import 'package:production/Screens/Route/RouteScreenforAgent.dart';
 import 'package:production/variables.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -250,29 +248,29 @@ class _LoginscreenState extends State<Loginscreen> {
             print(
                 '🔄 Skipping unconditional saveLoginData(); save will occur only for unitid 9 or 18');
 
-            // Check if user is a driver (unitid == 9)
+            // Check if user is an agent
             if (mounted) {
               final int? _unitid = loginresponsebody?['unitid'];
 
-              // If unitid == 18 => Agent
-              if (_unitid == 9 ||
-                  _unitid == 18 ||
-                  _unitid == 10 ||
-                  _unitid == 5) {
-                // Save login data for drivers/agents only
+              // This login screen is for agents only (unitid: 18, 10, 5)
+              final bool isAgent = _unitid == 18;
+
+              if (isAgent) {
+                // Save login data for agents only
                 try {
                   print(
-                      '🔄 unitid is ${_unitid} — saving login data to SQLite...');
+                      '🔄 unitid is ${_unitid} (Agent) — saving login data to SQLite...');
                   await saveLoginData();
                 } catch (e) {
                   print(
                       '❌ Error while saving login data for unitid ${_unitid}: $e');
                 }
-                // Make additional HTTP request for drivers
+
+                // Make additional HTTP request to get session data
                 try {
                   print(
-                      '🚗 User is a driver (unitid == 9), making additional request...');
-                  final driverResponse = await http.post(
+                      '📡 Making session request for agent unitid ${_unitid}...');
+                  final sessionResponse = await http.post(
                     processSessionRequest,
                     headers: <String, String>{
                       'Content-Type': 'application/json; charset=UTF-8',
@@ -286,19 +284,20 @@ class _LoginscreenState extends State<Loginscreen> {
                   );
                   vsid = loginresponsebody?['vsid']?.toString() ?? "";
                   print(
-                      '🚗 Driver HTTP Response Status: ${driverResponse.statusCode}');
-                  print('🚗 Driver HTTP Response Body: ${driverResponse.body}');
+                      '📡 Session HTTP Response Status: ${sessionResponse.statusCode}');
+                  print(
+                      '📡 Session HTTP Response Body: ${sessionResponse.body}');
 
-                  if (driverResponse.statusCode == 200) {
+                  if (sessionResponse.statusCode == 200) {
                     try {
-                      final driverResponseBody =
-                          json.decode(driverResponse.body);
-                      print('🚗 Driver Response JSON: $driverResponseBody');
+                      final sessionResponseBody =
+                          json.decode(sessionResponse.body);
+                      print('📡 Session Response JSON: $sessionResponseBody');
                       print(
-                          '🚗 Driver Response Keys: ${driverResponseBody.keys.toList()}');
+                          '📡 Session Response Keys: ${sessionResponseBody.keys.toList()}');
 
-                      // Update SQLite with driver response data - Access nested responseData
-                      final responseData = driverResponseBody['responseData'];
+                      // Update SQLite with session response data
+                      final responseData = sessionResponseBody['responseData'];
                       final projectName =
                           responseData?['projectName']?.toString() ?? '';
                       final projectId =
@@ -312,135 +311,93 @@ class _LoginscreenState extends State<Loginscreen> {
                       print('🔍 projectName: "$projectName"');
                       print('🔍 projectId: "$projectId"');
                       print('🔍 productionHouse: "$productionHouse"');
-                      print('🔍 productionHouse: "$productionTypeId"');
+                      print('🔍 productionTypeId: "$productionTypeId"');
 
-                      // Always try to update, even with empty values for testing
-                      print('🚗 Attempting SQLite update...');
+                      // Update SQLite with session data
+                      print('📡 Attempting SQLite update...');
                       await updateDriverLoginData(projectName, projectId,
                           productionHouse, productionTypeId);
-                      print('🚗 SQLite update call completed');
+                      print('📡 SQLite update call completed');
 
                       if (projectName.isNotEmpty ||
                           projectId.isNotEmpty ||
                           productionHouse.isNotEmpty) {
-                        print('🚗 Updated SQLite with driver response data');
+                        print('📡 Updated SQLite with session response data');
                       } else {
                         print(
-                            '⚠️ All driver data fields are empty, but update was attempted');
+                            '⚠️ All session data fields are empty, but update was attempted');
                       }
 
-                      // Conditional navigation based on responseData content
-                      if (driverResponseBody['responseData'] != null &&
-                          driverResponseBody['responseData'].toString() !=
-                              '{}' &&
-                          _unitid == 9 &&
-                          driverResponseBody['responseData']
-                              .toString()
-                              .isNotEmpty) {
-                        print(
-                            '🚗 ResponseData is not empty and unitid is 9, navigating to RoutescreenforIncharge');
-
-                        // Update driver field to false for incharge
-                        await updateDriverField(false);
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const RoutescreenforIncharge()
-                              // const Routescreenfordriver()
-                              ),
-                        );
-                      } else if (_unitid == 18 ||
-                          _unitid == 5 ||
-                          _unitid == 10) {
-                        print(
-                            '🚗 ResponseData is not empty and unit is 18, navigating to Routescreenforagent');
-
-                        // Update driver field to false for incharge
-                        await updateDriverField(false);
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const RoutescreenforAgent()),
-                        );
-                      } else {
-                        print(
-                            '🚗 ResponseData is empty, navigating to Routescreenfordriver');
-
-                        // Update driver field to true for driver
-                        await updateDriverField(true);
-
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  const Routescreenfordriver()),
-                        );
-                      }
-                    } catch (e) {
-                      print('❌ Error processing driver response JSON: $e');
+                      // Update isDriver field in SQLite - always false for agents
+                      await updateDriverField(false);
                       print(
-                          '🚗 Raw driver response body: ${driverResponse.body}');
+                          '✅ Updated isDriver field to: false for agent unitid ${_unitid}');
 
-                      // If JSON parsing fails, go to driver screen
+                      // Navigate to RouteScreenforAgent
                       print(
-                          '🚗 JSON parsing failed, navigating to Routescreenfordriver');
-
-                      // Update driver field to true for driver
-                      await updateDriverField(true);
+                          '👔 Agent (unitid: ${_unitid}) - navigating to RouteScreenforAgent');
 
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const Routescreenfordriver()),
+                            builder: (context) => const RoutescreenforAgent()),
+                      );
+                    } catch (e) {
+                      print('❌ Error processing session response JSON: $e');
+                      print(
+                          '📡 Raw session response body: ${sessionResponse.body}');
+
+                      // On JSON parsing error, still navigate with isDriver = false
+                      await updateDriverField(false);
+                      print(
+                          '⚠️ JSON parsing failed, navigating to RouteScreenforAgent anyway');
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const RoutescreenforAgent()),
                       );
                     }
                   } else {
                     print(
-                        '❌ Driver response status code: ${driverResponse.statusCode}');
-                    print('❌ Driver response body: ${driverResponse.body}');
+                        '❌ Session response status code: ${sessionResponse.statusCode}');
+                    print('❌ Session response body: ${sessionResponse.body}');
 
-                    // If driver response fails, go to driver screen
+                    // On session request failure, still navigate with isDriver = false
+                    await updateDriverField(false);
                     print(
-                        '🚗 Driver response failed, navigating to Routescreenfordriver');
-
-                    // Update driver field to true for driver
-                    await updateDriverField(true);
+                        '⚠️ Session request failed, navigating to RouteScreenforAgent anyway');
 
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const Routescreenfordriver()),
+                          builder: (context) => const RoutescreenforAgent()),
                     );
                   }
                 } catch (e) {
-                  print('❌ Error in driver HTTP request: $e');
+                  print('❌ Error in session HTTP request: $e');
 
-                  // If driver HTTP request fails, go to driver screen
+                  // On HTTP error, still navigate with isDriver = false
+                  await updateDriverField(false);
                   print(
-                      '🚗 Driver HTTP request failed, navigating to Routescreenfordriver');
-
-                  // Update driver field to true for driver
-                  await updateDriverField(true);
+                      '⚠️ Session HTTP request failed, navigating to RouteScreenforAgent anyway');
 
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const Routescreenfordriver()),
+                        builder: (context) => const RoutescreenforAgent()),
                   );
                 }
               } else {
-                // Show dialog for non-driver users
+                // Show dialog for invalid users (non-agents)
                 showDialog(
                   context: context,
                   barrierDismissible: false,
                   builder: (BuildContext context) {
                     return AlertDialog(
                       title: Text('Access Denied'),
-                      content: Text('You are a invalid User'),
+                      content: Text(
+                          'This is an agent login screen. Only agents (unitid: 5, 10, 18) can access this application.'),
                       actions: [
                         TextButton(
                           onPressed: () {

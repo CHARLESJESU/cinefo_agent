@@ -4,9 +4,6 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 import 'package:production/variables.dart';
 import 'package:production/Screens/Login/loginscreen.dart';
-import 'package:production/Screens/Route/RouteScreenfordriver.dart';
-import 'package:production/Screens/Route/RouteScreenforincharge.dart';
-
 import '../../service/update_service.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -40,7 +37,6 @@ class _SplashScreenState extends State<SplashScreen> {
       if (loginData != null) {
         print('🔍 DEBUG: Login data found');
         print('🔍 DEBUG: VSID: ${loginData['vsid']}');
-        print('🔍 DEBUG: Driver: ${loginData['driver']}');
         print('🔍 DEBUG: Manager: ${loginData['manager_name']}');
 
         // Load stored data into global variables
@@ -56,69 +52,15 @@ class _SplashScreenState extends State<SplashScreen> {
             );
           }
         } else {
-          // vsid exists - decide route based on driver flag
-          // dart
-// Replace the navigation decision block inside _initializeSplashScreen()
-// (the portion after you compute isDriver)
-
-          final dynamic driverFlag = loginData['driver'];
-          final dynamic agentFlag = loginData['isAgentt'];
-
-          bool isDriver = false;
-          if (driverFlag is int && driverFlag == 1) {
-            isDriver = true;
-            print('🔍 DEBUG: Driver flag matched as int 1');
-          }
-          if (driverFlag is bool && driverFlag == true) {
-            isDriver = true;
-            print('🔍 DEBUG: Driver flag matched as bool true');
-          }
-          if (driverFlag is String &&
-              (driverFlag == '1' || driverFlag.toLowerCase() == 'true')) {
-            isDriver = true;
-            print('🔍 DEBUG: Driver flag matched as string');
-          }
-
-          bool isAgent = false;
-          if (agentFlag is int && agentFlag == 1) {
-            isAgent = true;
-            print('🔍 DEBUG: Agent flag matched as int 1');
-          }
-          if (agentFlag is bool && agentFlag == true) {
-            isAgent = true;
-            print('🔍 DEBUG: Agent flag matched as bool true');
-          }
-          if (agentFlag is String &&
-              (agentFlag == '1' || agentFlag.toLowerCase() == 'true')) {
-            isAgent = true;
-            print('🔍 DEBUG: Agent flag matched as string');
-          }
-
-          print('🔍 DEBUG: Final isDriver=$isDriver, isAgent=$isAgent');
+          // vsid exists - navigate to agent route screen
+          print('� DEBUG: VSID found, navigating to RoutescreenforAgent');
 
           if (mounted) {
-            if (isDriver) {
-              print('🚗 DEBUG: Navigating to Routescreenfordriver');
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const Routescreenfordriver()),
-              );
-            } else if (isAgent) {
-              print('👔 DEBUG: Navigating to RoutescreenforAgent');
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const RoutescreenforAgent()),
-              );
-            } else {
-              print('👔 DEBUG: Navigating to RoutescreenforIncharge');
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const RoutescreenforIncharge()),
-              );
-            }
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const RoutescreenforAgent()),
+            );
           }
         }
       } else {
@@ -192,24 +134,11 @@ class _SplashScreenState extends State<SplashScreen> {
     productionHouse = loginData['production_house'] ?? ' ';
     vmid = loginData['vmid'] ?? 0;
 
-    // Convert driver field from int to bool (database stores as int, variable expects bool)
-    final driverValue = loginData['driver'];
-    final agentValue = loginData['isAgentt'];
-    if (driverValue is int) {
-      driver = driverValue == 1;
-    } else if (driverValue is bool) {
-      driver = driverValue;
-    } else {
-      driver = false; // default to false if null or other type
-    }
-
     // Set mobile number and password in controllers
     loginmobilenumber.text = loginData['mobile_number'] ?? '';
     loginpassword.text = loginData['password'] ?? '';
 
-    print('Loaded stored data: Manager=$managerName, Movie=$registeredMovie');
-    print(
-        '🔍 DEBUG: Converted driver value $driverValue (${driverValue.runtimeType}) to bool: $driver');
+    print('✅ Loaded stored data: Manager=$managerName, Movie=$registeredMovie');
   }
 
   @override
