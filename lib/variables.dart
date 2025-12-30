@@ -52,6 +52,10 @@ int secondLeadRoleOtherLanguage = 0;
 final processSessionRequest =
    Uri.parse('https://vgate.vframework.in/vgateapi/processSessionRequest');
 
+String mainbaseurl = "agentmembers.cinefo.com";
+String agentbaseurlfordev = "agentsmember.cinefo.club";
+String agentbaseurlforproduction = "agentmembers.cinefo.com";
+
 Map? closecallsheetresponse;
 Map<String, int> dubbingConfigStates = {};
 Map<String, int> finalDoubingMap = {};
@@ -99,9 +103,6 @@ String vmetid_save_config =
 
 String vmetid_fetch_unit =
     "Zfryf2Jt7ZnHxP57cfHT0n2vmTihWPqkwA8/pppCsOODTriG9m20x+DOfaKwZiJZTXYMUS2BVh/1fk0LWpYMjmey/SADWvv7XQ2Cmyxpsf0++IQjT4YhEnHGkgyuoc2pxZyaw2bDIhzje7JOFAGkVjIFCvvN3TsWXxqH5boL+bhlmIIlNGqGivm+gLqR9RnU4E6YZcC6eRF030s6pdTQagY17SU3O4TfUNgdAFEcsADAh3V8TfxDPMG8Ih1iGRPZnD25WlmJXXyeSVmFBoW+R2UDa3mHhdUGPNwFZIqAJbmbMvdOHriIfO2yElyDYUCBXNZmF4Z622R3xFeuPcDcpA==";
-String mainbaseurl = "agentmembers.cinefo.com";
-String agentbaseurlfordev = "agentsmember.cinefo.club";
-String agentbaseurlforproduction = "agentmembers.cinefo.com";
 
 String cinefoagent = 'assets/cine agent.png';
 String cinefodriver = 'assets/driver_union_logo.png';
