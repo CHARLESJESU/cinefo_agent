@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 import 'package:production/Screens/callsheet/callsheet_detail.dart';
+import 'package:production/sessionexpired.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../ApiCalls/apicall.dart';
@@ -60,6 +61,22 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
               vsid: logindata!['vsid'] ?? '',
             );
             print('approvalofproductionmanager2api result: $result2');
+
+            // Check for session expiration
+            if (!result2['success']) {
+              try {
+                Map error = jsonDecode(result2['body']);
+                if (error['errordescription'] == "Session Expired") {
+                  if (mounted) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => const Sessionexpired()));
+                  }
+                  return;
+                }
+              } catch (e) {
+                print('Error parsing error response: $e');
+              }
+            }
 
             // Parse result2 body safely to inspect responseData.Statusid
             dynamic body2 = result2['body'];

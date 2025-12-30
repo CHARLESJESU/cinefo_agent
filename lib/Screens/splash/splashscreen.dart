@@ -175,10 +175,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                       child: ClipOval(
                         child: Image.asset(
-                          // cinefoagent,
-                          // dance__logo,
-                          // setting__logo,
-                          // cinefodriver,
+          
                           cinefo__logo,
                           fit: BoxFit.cover,
                         ),
@@ -189,10 +186,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
                     // App Title
                     Text(
-                      // 'Agent App',
+    
                       'Agent App',
-                      // 'Setting App',
-                      // 'Driver App',
+
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,

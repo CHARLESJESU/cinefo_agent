@@ -5,10 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 class UpdateService {
   // Provided Play Store url; user gave this one.
-  // static const String playStoreUrl =
-  //     'https://play.google.com/store/apps/details?id=com.vlabs.cinefo_agent';
-  // static const String playStoreUrl =
-  //     'https://play.google.com/store/apps/details?id=com.vlabs.cinefo_dancer';
   static const String playStoreUrl =
       'https://play.google.com/store/apps/details?id=com.vlabs.cinefo_agent';
 

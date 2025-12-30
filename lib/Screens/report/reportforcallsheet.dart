@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:production/Screens/report/callsheetmembers.dart';
+import 'package:production/sessionexpired.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 import '../../ApiCalls/apicall.dart' as apicalls;
-import '../callsheet/callsheet_detail.dart';
 
 class Reportforcallsheet extends StatefulWidget {
   const Reportforcallsheet({super.key});
@@ -116,6 +116,17 @@ class _ReportforcallsheeteState extends State<Reportforcallsheet> {
         _showSuccess('Callsheet data loaded successfully!');
       } else {
         print('❌ Lookup callsheet API failed: ${result['body']}');
+        // Check for session expiration
+        try {
+          Map error = jsonDecode(result['body']);
+          if (error['errordescription'] == "Session Expired") {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Sessionexpired()));
+            return;
+          }
+        } catch (e) {
+          print('Error parsing error response: $e');
+        }
         _showError('Failed to load callsheet data: ${result['body']}');
       }
     } catch (e) {

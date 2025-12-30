@@ -3,7 +3,6 @@ import 'package:production/Screens/Attendance/intime.dart';
 import 'package:production/Screens/Attendance/nfcnotifier.dart';
 import 'package:production/Screens/Attendance/outtimecharles.dart';
 import 'package:production/Screens/Home/colorcode.dart';
-import 'package:production/Screens/configuration/configuration.dart';
 import 'package:production/variables.dart';
 import 'package:provider/provider.dart';
 

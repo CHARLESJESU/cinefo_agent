@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:production/ApiCalls/apicall.dart';
+import 'package:production/sessionexpired.dart';
 
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
@@ -530,16 +531,8 @@ class IntimeSyncService {
         }
 
         print('IntimeSyncService: POST statusCode=\\${response.statusCode}');
-        if (response.statusCode == 200 ||
-            response.statusCode == 1017 ||
-            response.statusCode == 1021 ||
-            response.statusCode == 1023 ||
-            response.statusCode == 1019 ||
-            response.statusCode == 1016 ||
-            response.statusCode == 3002 ||
-            response.statusCode == 1022 ||
-            response.statusCode == 1027 ||
-            response.statusCode == 1018) {
+        if (response.statusCode == 200 
+       ) {
           print(
               "IntimeSyncService: Deleting row id=${row['id']} after successful POST.");
           try {
@@ -571,14 +564,24 @@ class IntimeSyncService {
               }
             }
           }
-        } else if (response.statusCode == -1 ||
-            response.statusCode == 400 ||
-            response.statusCode == 500) {
+        } else if (
+            response.statusCode == 404 ||
+            response.statusCode == 502) {
           print(
               "IntimeSyncService: Skipping row id=${row['id']} due to statusCode=${response.statusCode}. Data not deleted.");
           // Skip this row, do not delete, continue to next row
           continue;
         } else {
+          // Check for session expiration
+          try {
+            Map error = jsonDecode(response.body);
+            if (error['errordescription'] == "Session Expired") {
+              print("Session expired, user needs to re-login");
+              // Note: Cannot navigate from background service, session will be handled on next foreground activity
+            }
+          } catch (e) {
+            print('Error parsing response: $e');
+          }
           print(
               "IntimeSyncService: POST failed for row id=${row['id']}, stopping sync this cycle.");
           // Stop on first failure to preserve FIFO

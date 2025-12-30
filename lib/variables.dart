@@ -43,14 +43,14 @@ int leadRole = 0;
 int secondLeadRole = 0;
 int leadRoleOtherLanguage = 0;
 int secondLeadRoleOtherLanguage = 0;
-final processRequest =
-    Uri.parse('https://devvgate.vframework.in/vgateapi/processRequest');
 // final processRequest =
-//     Uri.parse('https://vgate.vframework.in/vgateapi/processRequest');
-final processSessionRequest =
-    Uri.parse('https://devvgate.vframework.in/vgateapi/processSessionRequest');
+//     Uri.parse('https://devvgate.vframework.in/vgateapi/processRequest');
 // final processSessionRequest =
-//    Uri.parse('https://vgate.vframework.in/vgateapi/processSessionRequest');
+//     Uri.parse('https://devvgate.vframework.in/vgateapi/processSessionRequest');
+    final processRequest =
+    Uri.parse('https://vgate.vframework.in/vgateapi/processRequest');
+final processSessionRequest =
+   Uri.parse('https://vgate.vframework.in/vgateapi/processSessionRequest');
 
 Map? closecallsheetresponse;
 Map<String, int> dubbingConfigStates = {};
@@ -99,20 +99,16 @@ String vmetid_save_config =
 
 String vmetid_fetch_unit =
     "Zfryf2Jt7ZnHxP57cfHT0n2vmTihWPqkwA8/pppCsOODTriG9m20x+DOfaKwZiJZTXYMUS2BVh/1fk0LWpYMjmey/SADWvv7XQ2Cmyxpsf0++IQjT4YhEnHGkgyuoc2pxZyaw2bDIhzje7JOFAGkVjIFCvvN3TsWXxqH5boL+bhlmIIlNGqGivm+gLqR9RnU4E6YZcC6eRF030s6pdTQagY17SU3O4TfUNgdAFEcsADAh3V8TfxDPMG8Ih1iGRPZnD25WlmJXXyeSVmFBoW+R2UDa3mHhdUGPNwFZIqAJbmbMvdOHriIfO2yElyDYUCBXNZmF4Z622R3xFeuPcDcpA==";
-
+String mainbaseurl = "agentmembers.cinefo.com";
 String agentbaseurlfordev = "agentsmember.cinefo.club";
 String agentbaseurlforproduction = "agentmembers.cinefo.com";
-String dancebaseurlfordev = "dancermember.cinefo.club";
-String dancebaseurlforproduction = "dancermember.cinefo.com";
-String settingbaseurlfordev = "settingmember.cinefo.club";
-String settingbaseurlforproduction = "settingmember.cinefo.com";
 
 String cinefoagent = 'assets/cine agent.png';
 String cinefodriver = 'assets/driver_union_logo.png';
 String cinefoproduction = 'assets/tenkrow.png';
 String cinefologo = 'assets/cinefo-logo.png';
 String cinefo__logo = 'assets/cinefomainlogo.jpeg';
-String dance__logo = 'assets/Dancers.png';
+
 String setting__logo = 'assets/Setting_Union_Logo.png';
 
 // Global RouteObserver used by pages that implement RouteAware to refresh on navigation
