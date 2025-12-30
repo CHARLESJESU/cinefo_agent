@@ -22,6 +22,7 @@ Future<void> fetchloginDataFromSqlite() async {
     } else {
       print("❌❌❌❌❌❌ String");
     }
+    globalloginData=first;
     productionTypeId = first['production_type_id'] ?? 0;
     vmid = first['vmid'];
     unitid = first['unitid'];

@@ -334,6 +334,9 @@ class _SqlitelistState extends State<Sqlitelist> {
                                             _buildDetailRow('Union Name', item['unionName']),
                                             _buildDetailRow('VCID', item['vcid']),
                                             _buildDetailRow('RFID', item['rfid']),
+                                            _buildDetailRow('Project ID', item['projectId']?.toString()),
+                                            _buildDetailRow('Production Type ID', item['productionTypeId']?.toString()),
+
                                             _buildDetailRow('CallsheetID', item['callsheetid']?.toString()),
                                             _buildDetailRow('Marked At', _formatDate(item['marked_at'])),
                                             _buildDetailRow('attendance_status', item['attendance_status']),

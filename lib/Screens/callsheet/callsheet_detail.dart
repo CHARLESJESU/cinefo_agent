@@ -5,7 +5,7 @@ import 'package:production/Screens/Attendance/outtimecharles.dart';
 import 'package:production/Screens/Home/colorcode.dart';
 import 'package:production/variables.dart';
 import 'package:provider/provider.dart';
-
+import '../../main.dart';
 class CallsheetDetailScreen extends StatelessWidget {
   final Map<String, dynamic> callsheet;
   const CallsheetDetailScreen({Key? key, required this.callsheet})
@@ -53,7 +53,10 @@ class CallsheetDetailScreen extends StatelessWidget {
     final String? location = callsheet['location']?.toString();
     final String? Moviename = callsheet['projectName']?.toString();
     final String? time = callsheet['shift']?.toString();
-
+    projectIdforattendance = callsheet['projectId'];
+    productionTypeIdforattendance = callsheet['productionTypeId'];
+    print("projectIdforattendance is $projectIdforattendance");
+    print("productionTypeIdforattendance is $productionTypeIdforattendance");
     // Format created date from API response - exactly like offline screen
     String createdAtRaw = '';
     String createdAtDisplay = '';

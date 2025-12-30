@@ -11,7 +11,7 @@ String? location;
 String? locationofcharles;
 bool isoffline = false;
 Map? getdeviceidresponse;
-
+Map? globalloginData;
 String? productionHouse;
 String? projectId;
 String? managerName;

@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:production/ApiCalls/apicall.dart';
+import 'package:production/main.dart';
 import 'package:production/sessionexpired.dart';
 
 import 'package:sqflite/sqflite.dart';
@@ -84,6 +85,8 @@ class _CountdownDialogState extends State<_CountdownDialog> {
           rfid TEXT,
           code TEXT,
           unionName TEXT,
+          projectId INTEGER,
+          productionTypeId INTEGER,
           vcid TEXT,
           marked_at TEXT,
           latitude TEXT,
@@ -303,6 +306,8 @@ class _CountdownDialogState extends State<_CountdownDialog> {
         'latitude': lat,
         'longitude': lon,
         'location': loc,
+        'projectId': projectIdforattendance,
+        'productionTypeId': productionTypeIdforattendance,
         'attendance_status': widget.attendanceStatus,
         'callsheetid': callsheetid,
         'mode': isoffline ? 'offline' : 'online',
@@ -448,6 +453,8 @@ class IntimeSyncService {
           code TEXT,
           unionName TEXT,
           vcid TEXT,
+          projectId INTEGER,
+          productionTypeId INTEGER,
           marked_at TEXT,
           latitude TEXT,
           longitude TEXT,
@@ -473,8 +480,8 @@ class IntimeSyncService {
         final requestBody = jsonEncode({
           "data": row['vcid'],
           "callsheetid": row['callsheetid'],
-          "projectid": projectId,
-          "productionTypeId": productionTypeId,
+          "projectId": row['projectId'],
+          "productionTypeId": row['productionTypeId'],
           "rfid": row['rfid'],
           "doubing": {},
           "latitude": row['latitude'],
