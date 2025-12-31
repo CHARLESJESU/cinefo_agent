@@ -18,7 +18,7 @@ android {
 //    namespace = "com.vlabs.cinefo_agent"
     namespace = "com.vlabs.cinefo_agent"
     compileSdk = 36
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
     sourceCompatibility JavaVersion.VERSION_17

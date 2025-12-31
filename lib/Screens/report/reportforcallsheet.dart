@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:production/Screens/report/callsheetmembers.dart';
 import 'package:production/sessionexpired.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' as path;
 import '../../ApiCalls/apicall.dart' as apicalls;
 
 class Reportforcallsheet extends StatefulWidget {
@@ -14,54 +12,14 @@ class Reportforcallsheet extends StatefulWidget {
 }
 
 class _ReportforcallsheeteState extends State<Reportforcallsheet> {
-  Database? _database;
-  Map<String, dynamic>? logindata;
   bool _isLoading = false;
   List<Map<String, dynamic>> callSheetData = [];
-  String global_projectidString = " ";
+  String global_projectidString = "";
+  
   @override
   void initState() {
     super.initState();
     _initializeAndCallAPI();
-  }
-
-  // Initialize database
-  Future<Database> get database async {
-    if (_database != null) return _database!;
-    _database = await _initDatabase();
-    return _database!;
-  }
-
-  // Initialize database connection
-  Future<Database> _initDatabase() async {
-    String dbPath = path.join(await getDatabasesPath(), 'production_login.db');
-    return await openDatabase(
-      dbPath,
-      version: 1,
-      // This just connects to existing database
-    );
-  }
-
-  // Get login data from SQLite
-  Future<Map<String, dynamic>?> _getLoginData() async {
-    try {
-      final db = await database;
-      final List<Map<String, dynamic>> maps = await db.query(
-        'login_data',
-        orderBy: 'id ASC',
-        limit: 1,
-      );
-
-      if (maps.isNotEmpty) {
-        print('📊 Login data found: ${maps.first}');
-        return maps.first;
-      }
-      print('🔍 No login data found in table');
-      return null;
-    } catch (e) {
-      print('❌ Error getting login data: $e');
-      return null;
-    }
   }
 
   // Initialize and call API
@@ -69,86 +27,85 @@ class _ReportforcallsheeteState extends State<Reportforcallsheet> {
     setState(() => _isLoading = true);
 
     try {
-      // First fetch the login_data table values
-      logindata = await _getLoginData();
-
-      if (logindata != null) {
-        // Call lookupcallsheetapi with retrieved values
-        await _callLookupCallsheetAPI();
-      } else {
-        _showError('No login data found. Please login first.');
+      // First fetch login data from SQLite
+      await apicalls.fetchloginDataFromSqlite();
+      
+      // Then call agent report API
+      final result = await apicalls.agentreportapi();
+      print("🚗 Agent Report API Response: ${result['body']}");
+      print("🔍 API Result Success: ${result['success']}");
+      print("🔍 API Result Keys: ${result.keys}");
+      
+      // Parse the response and extract callsheet data
+      _parseCallSheetResponse(result['body']);
+      
+      if (callSheetData.isNotEmpty) {
+        _showSuccess('Callsheet data loaded successfully!');
       }
     } catch (e) {
-      _showError('Error initializing: $e');
+      print('❌ Error calling API: $e');
+      _showError('Error loading callsheet data: $e');
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  // Call the lookup callsheet API
-  Future<void> _callLookupCallsheetAPI() async {
-    try {
-      // Convert projectid to integer
-      int projectidInt;
-      final projectidValue = logindata!['project_id'];
-      if (projectidValue is String) {
-        projectidInt = int.tryParse(projectidValue) ?? 0;
-      } else if (projectidValue is int) {
-        projectidInt = projectidValue;
-      } else {
-        projectidInt = 0;
-      }
-
-      print(
-          '🔄 Converting project_id: $projectidValue (${projectidValue.runtimeType}) → $projectidInt');
-      global_projectidString = projectidInt.toString();
-      final result = await apicalls.lookupcallsheetapi(
-        projectid: projectidInt,
-        vsid: logindata!['vsid'] ?? '',
-      );
-
-      if (result['success']) {
-        print('✅ Lookup callsheet API successful');
-        print('📄 Response: ${result['body']}');
-
-        // Parse the response and extract callsheet data
-        _parseCallSheetResponse(result['body']);
-        _showSuccess('Callsheet data loaded successfully!');
-      } else {
-        print('❌ Lookup callsheet API failed: ${result['body']}');
-        // Check for session expiration
-        try {
-          Map error = jsonDecode(result['body']);
-          if (error['errordescription'] == "Session Expired") {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const Sessionexpired()));
-            return;
-          }
-        } catch (e) {
-          print('Error parsing error response: $e');
-        }
-        _showError('Failed to load callsheet data: ${result['body']}');
-      }
-    } catch (e) {
-      print('❌ Error calling lookup callsheet API: $e');
-      _showError('Error loading callsheet data: $e');
-    }
-  }
-
   // Parse the API response and extract callsheet data
-  void _parseCallSheetResponse(String responseBody) {
+  void _parseCallSheetResponse(dynamic responseBody) {
+    print('🔧 Starting to parse response...');
+    print('🔧 Response body type: ${responseBody.runtimeType}');
+    print('🔧 Response body: $responseBody');
+    
     try {
-      final Map<String, dynamic> response = jsonDecode(responseBody);
-      if (response['responseData'] != null &&
-          response['responseData'] is List) {
+      Map<String, dynamic> response;
+      
+      // Check if responseBody is already a Map or needs to be decoded
+      if (responseBody is String) {
+        response = jsonDecode(responseBody);
+      } else if (responseBody is Map<String, dynamic>) {
+        response = responseBody;
+      } else {
+        print('❌ Unexpected response type: ${responseBody.runtimeType}');
         setState(() {
-          callSheetData =
-          List<Map<String, dynamic>>.from(response['responseData']);
+          callSheetData = [];
         });
-        print('📋 Parsed ${callSheetData.length} callsheet records');
+        return;
       }
-    } catch (e) {
+      
+      print('🔧 Decoded JSON successfully');
+      print('🔧 Response keys: ${response.keys}');
+      print('🔧 responseData exists: ${response.containsKey('responseData')}');
+      print('🔧 responseData value: ${response['responseData']}');
+      print('🔧 responseData type: ${response['responseData']?.runtimeType}');
+      
+      if (response['responseData'] != null && response['responseData'] is List) {
+        final List<dynamic> rawData = response['responseData'] as List;
+        print('🔧 responseData length: ${rawData.length}');
+        
+        setState(() {
+          callSheetData = rawData
+              .where((item) => item != null)
+              .map((item) => Map<String, dynamic>.from(item as Map))
+              .toList();
+        });
+        
+        print('📋 Parsed ${callSheetData.length} callsheet records');
+        
+        if (callSheetData.isNotEmpty) {
+          print('📋 First record: ${callSheetData[0]}');
+          global_projectidString = callSheetData[0]['projectId']?.toString() ?? "";
+          print('📋 Set global projectId: $global_projectidString');
+        }
+      } else {
+        print('⚠️ responseData is null or not a List');
+        print('⚠️ responseData value: ${response['responseData']}');
+        setState(() {
+          callSheetData = [];
+        });
+      }
+    } catch (e, stackTrace) {
       print('❌ Error parsing callsheet response: $e');
+      print('❌ Stack trace: $stackTrace');
       setState(() {
         callSheetData = [];
       });
@@ -177,6 +134,23 @@ class _ReportforcallsheeteState extends State<Reportforcallsheet> {
         ),
       );
     }
+  }
+
+  // Format date from YYYYMMDD to DD-MM-YYYY
+  String _formatDate(dynamic dateValue) {
+    if (dateValue == null) return "N/A";
+    
+    String dateStr = dateValue.toString();
+    
+    // If it's in YYYYMMDD format (8 digits)
+    if (dateStr.length == 8 && int.tryParse(dateStr) != null) {
+      String year = dateStr.substring(0, 4);
+      String month = dateStr.substring(4, 6);
+      String day = dateStr.substring(6, 8);
+      return "$day-$month-$year";
+    }
+    
+    return dateStr;
   }
 
   @override
@@ -310,9 +284,7 @@ class _ReportforcallsheeteState extends State<Reportforcallsheet> {
     final String callSheetId = callSheet['callSheetId']?.toString() ?? "N/A";
     final String callSheetNo = callSheet['callSheetNo']?.toString() ?? "N/A";
     final String projectName = callSheet['projectName']?.toString() ?? "N/A";
-    final String createdDate = callSheet['createdDate']?.toString() ??
-        callSheet['date']?.toString() ??
-        "N/A";
+    final String date = _formatDate(callSheet['date']);
     final String shift = callSheet['shift']?.toString() ?? "N/A";
     final String status = callSheet['callsheetStatus']?.toString() ?? "N/A";
     return GestureDetector(
@@ -321,7 +293,10 @@ class _ReportforcallsheeteState extends State<Reportforcallsheet> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => Callsheetmembers(projectId: global_projectidString,maincallsheetid: callSheetId,isOffline: false),
+            builder: (_) => Callsheetmembers(
+              projectId: global_projectidString,
+              maincallsheetid: callSheetId,
+            ),
           ),
         );
       },
@@ -447,7 +422,7 @@ class _ReportforcallsheeteState extends State<Reportforcallsheet> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  createdDate,
+                  date,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -509,7 +484,6 @@ class _ReportforcallsheeteState extends State<Reportforcallsheet> {
 
   @override
   void dispose() {
-    _database?.close();
     super.dispose();
   }
 }

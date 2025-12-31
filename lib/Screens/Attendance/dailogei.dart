@@ -480,7 +480,7 @@ class IntimeSyncService {
         final requestBody = jsonEncode({
           "data": row['vcid'],
           "callsheetid": row['callsheetid'],
-          "projectId": row['projectId'],
+          "projectid": row['projectId'],
           "productionTypeId": row['productionTypeId'],
           "rfid": row['rfid'],
           "doubing": {},
