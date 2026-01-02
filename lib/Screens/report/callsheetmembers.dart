@@ -28,13 +28,13 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
     print(agentunitid);
     print(globalloginData?['vsid'] ?? '');
     await fetchloginDataFromSqlite();
-    final payload={
-"unitid": agentunitid,
-"callsheetid": widget.maincallsheetid,
-"vmid": 0,
-};
-print(payload);
-//api call 
+    final payload = {
+      "unitid": agentunitid,
+      "callsheetid": widget.maincallsheetid,
+      "vmid": 0,
+    };
+    print(payload);
+//api call
     try {
       final response = await http.post(
         processSessionRequest,
@@ -46,15 +46,36 @@ print(payload);
         },
         body: jsonEncode(payload),
       );
-    if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         print("${response.body}✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ");
         final decoded = jsonDecode(response.body);
+
+        // Check if there's a message to show
+        if (decoded['message'] != null &&
+            decoded['message'].toString().isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(decoded['message'].toString()),
+              backgroundColor: decoded['responseData'] != null
+                  ? Colors.green
+                  : Colors.orange,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
+
         if (decoded['responseData'] != null) {
           List<AttendanceEntry> entries = (decoded['responseData'] as List)
               .map((e) => AttendanceEntry.fromJson(e))
               .toList();
           setState(() {
             reportData = entries;
+            isLoading = false;
+          });
+        } else {
+          // No data found, stop loading
+          setState(() {
+            reportData = [];
             isLoading = false;
           });
         }
