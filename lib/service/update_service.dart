@@ -5,10 +5,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 class UpdateService {
   // Provided Play Store url; user gave this one.
-  // static const String playStoreUrl =
-  //     'https://play.google.com/store/apps/details?id=com.vlabs.cinefo_agent';
-  // static const String playStoreUrl =
-  //     'https://play.google.com/store/apps/details?id=com.vlabs.cinefo_dancer';
   static const String playStoreUrl =
       'https://play.google.com/store/apps/details?id=com.vlabs.cinefo_agent';
 
@@ -62,13 +58,12 @@ class UpdateService {
         }
       }
 
-      // If we reach here, in-app flows didn't run or failed -> fallback to Play Store
-      debugPrint('UpdateService: falling back to Play Store URL.');
-      await _openPlayStore();
+      // If we reach here, in-app flows didn't run or failed
+      // Don't force open Play Store - let user continue using app
+      debugPrint('UpdateService: in-app update flows not available.');
     } catch (e, st) {
       debugPrint('UpdateService: checkForUpdate failed: $e\n$st');
-      // Fallback if entire in-app check failed
-      await _openPlayStore();
+      // Don't force open Play Store on errors - let user continue using app
     }
   }
 

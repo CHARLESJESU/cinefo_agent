@@ -22,6 +22,7 @@ Future<void> fetchloginDataFromSqlite() async {
     } else {
       print("❌❌❌❌❌❌ String");
     }
+    globalloginData=first;
     productionTypeId = first['production_type_id'] ?? 0;
     vmid = first['vmid'];
     unitid = first['unitid'];
@@ -71,6 +72,42 @@ Future<Map<String, dynamic>> driverreportapi({
   }
 }
 
+
+Future<Map<String, dynamic>> agentreportapi() async {
+  try {
+    final payload = {};
+    print("agentreportapiagentreportapi ${globalloginData?['vsid']}");
+    final tripstatusresponse = await http.post(
+      processSessionRequest,
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'VMETID':
+            'Oi05x+2wDhjG1diiQLR9DV6UwTPSDdKGvjNubE+YYu/ZpQ28r5o6d3NMOcFfbkIRpQ1Wk667jx5ksuyGpm3mE3vD1KOeoxTmu4c9ZFwXst8MSA1E+3kkvc9DgEGDXCou+gB64ztDzmo46NIPGVWl+nFdCyBxDnWn0sVaDWV2EIZh9ZADizVNOGfK5WVxWPZPipiBlQ9Pc9rzTo+JqvHmY7G0MXvnVQpnIMoIov5Hr7gP02/NhijxTA7+yLEggkZ0Ko+FogRjSi32PwnzY/K/dPntPT4cdXXuQIOV2CPePsd4Hy+pjrx79v2wD1V37zb8uDx+7kQ2QtWhvtK7R6iwEw==',
+        'VSID': globalloginData?['vsid'] ?? '',
+      },
+      body: jsonEncode(payload),
+    );
+
+    print(
+        '🚗 driverreportapi Status API Response Status: ${tripstatusresponse.statusCode}');
+    print('🚗 driverreportapi Status API Response Status: ${payload}');
+    print(
+        '🚗 driverreportapi Status API Response Body: ${tripstatusresponse.body}');
+
+    return {
+      'statusCode': tripstatusresponse.statusCode,
+      'body': tripstatusresponse.body,
+      'success': tripstatusresponse.statusCode == 200,
+    };
+  } catch (e) {
+    print('❌ Error in tripstatusapi: $e');
+    return {
+      'statusCode': 0,
+      'body': 'Error: $e',
+      'success': false,
+    };
+  }
+}
 Future<Map<String, dynamic>> otpupdateapi({
   required String otp,
   required int tripid,

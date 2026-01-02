@@ -2,22 +2,18 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:production/ApiCalls/apicall.dart';
-
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' as path;
 import 'package:production/sessionexpired.dart';
 import 'package:production/variables.dart';
 
 class Callsheetmembers extends StatefulWidget {
   final String projectId;
   final String maincallsheetid;
-  final bool isOffline;
 
-  const Callsheetmembers(
-      {super.key,
-      required this.projectId,
-      required this.maincallsheetid,
-      this.isOffline = false});
+  const Callsheetmembers({
+    super.key,
+    required this.projectId,
+    required this.maincallsheetid,
+  });
 
   @override
   State<Callsheetmembers> createState() => _CallsheetmembersState();
@@ -27,97 +23,30 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
   List<AttendanceEntry> reportData = [];
   bool isLoading = true;
 
-  Future<void> fetchOfflineAttendanceData() async {
-    try {
-      final dbPath = await getDatabasesPath();
-      final db = await openDatabase(path.join(dbPath, 'production_login.db'));
-
-      // Query intime table for attendance data matching the callsheet ID
-      final List<Map<String, dynamic>> intimeData = await db.query(
-        'intime',
-        where: 'callsheetid = ?',
-        whereArgs: [int.parse(widget.maincallsheetid)],
-      );
-
-      // Group data by person (name or vcid) and combine in/out times
-      Map<String, AttendanceEntry> attendanceMap = {};
-
-      for (var record in intimeData) {
-        String personKey = record['name'] ?? record['vcid'] ?? 'Unknown';
-        String attendanceStatus = record['attendance_status']?.toString() ?? '';
-        String markedTime = record['marked_at'] ?? '';
-
-        if (attendanceMap.containsKey(personKey)) {
-          // Update existing entry
-          if (attendanceStatus == '1') {
-            attendanceMap[personKey] = attendanceMap[personKey]!.copyWith(
-              inTime: _formatTime(markedTime),
-            );
-          } else if (attendanceStatus == '2') {
-            attendanceMap[personKey] = attendanceMap[personKey]!.copyWith(
-              outTime: _formatTime(markedTime),
-            );
-          }
-        } else {
-          // Create new entry - for offline data, create combined code from available fields
-          String unitCode = record['unitId']?.toString() ?? '';
-          String memberCodeCode = record['code']?.toString() ?? '';
-          String combinedCode = unitCode.isNotEmpty && memberCodeCode.isNotEmpty
-              ? '$unitCode-$memberCodeCode'
-              : (unitCode.isNotEmpty ? unitCode : memberCodeCode);
-
-          attendanceMap[personKey] = AttendanceEntry(
-            memberName: record['name'] ?? 'Unknown',
-            code: combinedCode.isNotEmpty ? combinedCode : null,
-            inTime: attendanceStatus == '1' ? _formatTime(markedTime) : null,
-            outTime: attendanceStatus == '2' ? _formatTime(markedTime) : null,
-          );
-        }
-      }
-
-      setState(() {
-        reportData = attendanceMap.values.toList();
-        isLoading = false;
-      });
-
-      await db.close();
-    } catch (e) {
-      print("Error fetching offline attendance: $e");
-      setState(() => isLoading = false);
-    }
-  }
-
-  String _formatTime(String? isoString) {
-    if (isoString == null || isoString.isEmpty) return '--';
-    try {
-      DateTime dateTime = DateTime.parse(isoString);
-      return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
-    } catch (e) {
-      return '--';
-    }
-  }
-
   Future<void> reportsscreen() async {
     print(widget.maincallsheetid);
-    print(widget.projectId);
+    print(agentunitid);
+    print(globalloginData?['vsid'] ?? '');
     await fetchloginDataFromSqlite();
+    final payload={
+"unitid": agentunitid,
+"callsheetid": widget.maincallsheetid,
+"vmid": 0,
+};
+print(payload);
+//api call 
     try {
       final response = await http.post(
         processSessionRequest,
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'VMETID':
-              "M1eZ6wLvBLCuSi4sdl6UoLJWnxZP5rJeLboXP93ukEsq/wVU4oxKSDUuD0ztNzeehHyKegLPgfFNJhMOm+sVeofs6HNJwTmSvrVpE2uIedFafjzruD4npza1tgz9gi0VYTaAU4gnqdtXEC4BCBjz6dGXV0BBdDWKpag1fZnOdB4+h2P9bv946GvG53+PsxFC30VEt5utBorby+AeL3xW6HjsK72KpZkE/YROUmdqwyjGapxu0NmAij2+zB9yYYvINMJa68aeBSEiaqWWKdJyqSL1nE3HhwmWJX/XCp+dNBRjtwgK5JZMIcsOl+ZX298fE0bghyXkq0lw69Kjmw2lmw==",
-          'VSID': vsid ?? "",
+              "VtHdAOR3ljcro4U+M9+kByyNPjr8d/b3VNhQmK9lwHYmkC5cUmqkmv6Ku5FFOHTYi9W80fZoAGhzNSB9L/7VCTAfg9S2RhDOMd5J+wkFquTCikvz38ZUWaUe6nXew/NSdV9K58wL5gDAd/7W0zSOpw7Qb+fALxSDZ8UmWdk7MxLkZDn0VIHwVAgv13JeeZVivtG7gu0DJvTyPixMJUFCQzzADzJHoIYtgXV4342izgfc4Lqca4rdjVwYV79/LLqmz1M8yAWXqfSRb+ArLo6xtPrjPInGZcIO8U6uTH1WmXvw+pk3xKD/WEEAFk69w8MI1TrntrzGgDPZ21NhqZXE/w==",
+          'VSID': globalloginData?['vsid'] ?? '',
         },
-        body: jsonEncode({
-          "callsheetid": widget.maincallsheetid,
-          "projectId": widget.projectId,
-        }),
+        body: jsonEncode(payload),
       );
-      print("${widget.maincallsheetid}✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ");
-      print("${widget.projectId}✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ");
-      if (response.statusCode == 200) {
+    if (response.statusCode == 200) {
         print("${response.body}✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ");
         final decoded = jsonDecode(response.body);
         if (decoded['responseData'] != null) {
@@ -149,11 +78,7 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
   @override
   void initState() {
     super.initState();
-    if (widget.isOffline) {
-      fetchOfflineAttendanceData();
-    } else {
-      reportsscreen();
-    }
+    reportsscreen();
   }
 
   @override
@@ -180,9 +105,7 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
                       ),
                       SizedBox(width: 20),
                       Text(
-                        widget.isOffline
-                            ? "Offline Report Details"
-                            : "Callsheet Attendance Details",
+                        "Callsheet Attendance Details",
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
