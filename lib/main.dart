@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:production/Screens/splash/splashscreen.dart';
 
 import 'Screens/Attendance/dailogei.dart';
-import 'variables.dart'; // Import the file where routeObserver is defined
+import 'variables.dart';
+ // Import the file where routeObserver is defined
+int? projectIdforattendance;
+int? productionTypeIdforattendance;
 
 void main() {
   IntimeSyncService().startSync(); // Start background FIFO sync at app startup

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:production/Screens/Login/login_dialog_helper.dart';
+import 'package:production/sessionexpired.dart';
 import 'package:production/variables.dart';
 
 class Changepassword extends StatefulWidget {
@@ -50,10 +51,26 @@ class _ChangepasswordState extends State<Changepassword> {
       newpassword.clear();
       _popScreenAfterDelay();
     } else {
-      LoginDialogHelper.showSimplePopUp(
-        context,
-        "Failed to change the password",
-      );
+      setState(() {
+        isloading = false;
+      });
+      try {
+        Map error = jsonDecode(response.body);
+        if (error['errordescription'] == "Session Expired") {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const Sessionexpired()));
+        } else {
+          LoginDialogHelper.showSimplePopUp(
+            context,
+            "Failed to change the password",
+          );
+        }
+      } catch (e) {
+        LoginDialogHelper.showSimplePopUp(
+          context,
+          "Failed to change the password",
+        );
+      }
     }
   }
 
