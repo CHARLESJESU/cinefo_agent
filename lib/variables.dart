@@ -116,3 +116,9 @@ String setting__logo = 'assets/Setting_Union_Logo.png';
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+int? ssoGroupId;
+int? vptemplateID;
+String? emailOrPhone;
+int? mobileValidateType;
+Map? forgetpasswordresponseresult;
+Map? otpverifyresponseresult;

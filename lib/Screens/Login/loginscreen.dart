@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:production/Screens/Login/password/forgotpassword.dart';
 import 'package:production/Screens/Route/RouteScreenforAgent.dart';
 import 'package:production/variables.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -56,7 +57,7 @@ class _LoginscreenState extends State<Loginscreen> {
   }
 
   Future<void> baseurl() async {
-    final result = await _apiService.fetchBaseUrl();
+    final result = await _apiService.fetchBaseUrl(mainbaseurl);
     if (result != null) {
       setState(() {
         // Global variables are already set in the API service
@@ -262,130 +263,99 @@ class _LoginscreenState extends State<Loginscreen> {
             }
 
             // Save login data to SQLite after successful login
-            // Saving login data is now conditional based on user's unitid.
-            // It will only be saved for unitid == 9 (driver) or unitid == 18 (agent).
-            print(
-                '🔄 Skipping unconditional saveLoginData(); save will occur only for unitid 9 or 18');
+            print('🔄 Preparing to save login data...');
 
-            // Check if user is an agent
+            // Save login data and make session request
             if (mounted) {
-              final int? _unitid = loginresponsebody?['unitid'];
+              // Save login data
+              try {
+                print('🔄 Saving login data to SQLite...');
+                await saveLoginData();
+              } catch (e) {
+                print('❌ Error while saving login data: $e');
+              }
 
-              // This login screen is for agents only (unitid: 18, 10, 5)
-              final bool isAgent = _unitid == 18;
+              // Make additional HTTP request to get session data
+              try {
+                print('📡 Making session request...');
+                final sessionResponse = await http.post(
+                  processSessionRequest,
+                  headers: <String, String>{
+                    'Content-Type': 'application/json; charset=UTF-8',
+                    'VMETID':
+                        'P8eqnuQ9H24nzw+j/Oq8qih3vw9biFxC4i2XpRLOiSOcHiiqKN5II1gsqhUCeEM5TXUq+Hl19zup0tT7YnANhHFUL5HX9awoCOuKdn+nbYUX4OV3p5oIdjfLmdXQqc4JwrnpQy3kVFX2qtPPooFy9kIRzSjEKcQd0Rhqg4CuDYUxiBVesHhZdpAiTvRvrd4VOreauP6FysEt72O7XhOWvZilN9hQv8mQ+5ALfBFOrTuRu+9P7FczirlqCdUMFhXa64XTupbb4acIq2+bTYBd0I5isowfPBRKFc+GJcJEFnhCknqpDq/r9yxowFOcJUgIMjc0Tc3/S4JiasDqIiouYQ==',
+                    'VSID': loginresponsebody?['vsid']?.toString() ?? "",
+                  },
+                  body: jsonEncode(<String, dynamic>{
+                    "vmId": loginresponsebody?['responseData']?['vmid'] ?? 0,
+                  }),
+                );
+                vsid = loginresponsebody?['vsid']?.toString() ?? "";
+                print(
+                    '📡 Session HTTP Response Status: ${sessionResponse.statusCode}');
+                print('📡 Session HTTP Response Body: ${sessionResponse.body}');
 
-              if (isAgent) {
-                // Save login data for agents only
-                try {
-                  print(
-                      '🔄 unitid is ${_unitid} (Agent) — saving login data to SQLite...');
-                  await saveLoginData();
-                } catch (e) {
-                  print(
-                      '❌ Error while saving login data for unitid ${_unitid}: $e');
-                }
-
-                // Make additional HTTP request to get session data
-                try {
-                  print(
-                      '📡 Making session request for agent unitid ${_unitid}...');
-                  final sessionResponse = await http.post(
-                    processSessionRequest,
-                    headers: <String, String>{
-                      'Content-Type': 'application/json; charset=UTF-8',
-                      'VMETID':
-                          'P8eqnuQ9H24nzw+j/Oq8qih3vw9biFxC4i2XpRLOiSOcHiiqKN5II1gsqhUCeEM5TXUq+Hl19zup0tT7YnANhHFUL5HX9awoCOuKdn+nbYUX4OV3p5oIdjfLmdXQqc4JwrnpQy3kVFX2qtPPooFy9kIRzSjEKcQd0Rhqg4CuDYUxiBVesHhZdpAiTvRvrd4VOreauP6FysEt72O7XhOWvZilN9hQv8mQ+5ALfBFOrTuRu+9P7FczirlqCdUMFhXa64XTupbb4acIq2+bTYBd0I5isowfPBRKFc+GJcJEFnhCknqpDq/r9yxowFOcJUgIMjc0Tc3/S4JiasDqIiouYQ==',
-                      'VSID': loginresponsebody?['vsid']?.toString() ?? "",
-                    },
-                    body: jsonEncode(<String, dynamic>{
-                      "vmId": loginresponsebody?['responseData']?['vmid'] ?? 0,
-                    }),
-                  );
-                  vsid = loginresponsebody?['vsid']?.toString() ?? "";
-                  print(
-                      '📡 Session HTTP Response Status: ${sessionResponse.statusCode}');
-                  print(
-                      '📡 Session HTTP Response Body: ${sessionResponse.body}');
-
-                  if (sessionResponse.statusCode == 200) {
-                    try {
-                      final sessionResponseBody =
-                          json.decode(sessionResponse.body);
-                      print('📡 Session Response JSON: $sessionResponseBody');
-                      print(
-                          '📡 Session Response Keys: ${sessionResponseBody.keys.toList()}');
-
-                      // Update SQLite with session response data
-                      final responseData = sessionResponseBody['responseData'];
-                      final projectName =
-                          responseData?['projectName']?.toString() ?? '';
-                      final projectId =
-                          responseData?['projectId']?.toString() ?? '';
-                      final productionHouse =
-                          responseData?['productionHouse']?.toString() ?? '';
-                      final productionTypeId =
-                          responseData?['productionTypeId'] ?? 0;
-
-                      print('🔍 Extracted values from responseData:');
-                      print('🔍 projectName: "$projectName"');
-                      print('🔍 projectId: "$projectId"');
-                      print('🔍 productionHouse: "$productionHouse"');
-                      print('🔍 productionTypeId: "$productionTypeId"');
-
-                      // Update SQLite with session data
-                      print('📡 Attempting SQLite update...');
-                      await updateDriverLoginData(projectName, projectId,
-                          productionHouse, productionTypeId);
-                      print('📡 SQLite update call completed');
-
-                      if (projectName.isNotEmpty ||
-                          projectId.isNotEmpty ||
-                          productionHouse.isNotEmpty) {
-                        print('📡 Updated SQLite with session response data');
-                      } else {
-                        print(
-                            '⚠️ All session data fields are empty, but update was attempted');
-                      }
-
-                      // Update isDriver field in SQLite - always false for agents
-                      await updateDriverField(false);
-                      print(
-                          '✅ Updated isDriver field to: false for agent unitid ${_unitid}');
-
-                      // Navigate to RouteScreenforAgent
-                      print(
-                          '👔 Agent (unitid: ${_unitid}) - navigating to RouteScreenforAgent');
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RoutescreenforAgent()),
-                      );
-                    } catch (e) {
-                      print('❌ Error processing session response JSON: $e');
-                      print(
-                          '📡 Raw session response body: ${sessionResponse.body}');
-
-                      // On JSON parsing error, still navigate with isDriver = false
-                      await updateDriverField(false);
-                      print(
-                          '⚠️ JSON parsing failed, navigating to RouteScreenforAgent anyway');
-
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const RoutescreenforAgent()),
-                      );
-                    }
-                  } else {
+                if (sessionResponse.statusCode == 200) {
+                  try {
+                    final sessionResponseBody =
+                        json.decode(sessionResponse.body);
+                    print('📡 Session Response JSON: $sessionResponseBody');
                     print(
-                        '❌ Session response status code: ${sessionResponse.statusCode}');
-                    print('❌ Session response body: ${sessionResponse.body}');
+                        '📡 Session Response Keys: ${sessionResponseBody.keys.toList()}');
 
-                    // On session request failure, still navigate with isDriver = false
+                    // Update SQLite with session response data
+                    final responseData = sessionResponseBody['responseData'];
+                    final projectName =
+                        responseData?['projectName']?.toString() ?? '';
+                    final projectId =
+                        responseData?['projectId']?.toString() ?? '';
+                    final productionHouse =
+                        responseData?['productionHouse']?.toString() ?? '';
+                    final productionTypeId =
+                        responseData?['productionTypeId'] ?? 0;
+
+                    print('🔍 Extracted values from responseData:');
+                    print('🔍 projectName: "$projectName"');
+                    print('🔍 projectId: "$projectId"');
+                    print('🔍 productionHouse: "$productionHouse"');
+                    print('🔍 productionTypeId: "$productionTypeId"');
+
+                    // Update SQLite with session data
+                    print('📡 Attempting SQLite update...');
+                    await updateDriverLoginData(projectName, projectId,
+                        productionHouse, productionTypeId);
+                    print('📡 SQLite update call completed');
+
+                    if (projectName.isNotEmpty ||
+                        projectId.isNotEmpty ||
+                        productionHouse.isNotEmpty) {
+                      print('📡 Updated SQLite with session response data');
+                    } else {
+                      print(
+                          '⚠️ All session data fields are empty, but update was attempted');
+                    }
+
+                    // Update isDriver field in SQLite - always false for agents
+                    await updateDriverField(false);
+                    print('✅ Updated isDriver field to: false');
+
+                    // Navigate to RouteScreenforAgent
+                    print('👔 Navigating to RouteScreenforAgent');
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RoutescreenforAgent()),
+                    );
+                  } catch (e) {
+                    print('❌ Error processing session response JSON: $e');
+                    print(
+                        '📡 Raw session response body: ${sessionResponse.body}');
+
+                    // On JSON parsing error, still navigate with isDriver = false
                     await updateDriverField(false);
                     print(
-                        '⚠️ Session request failed, navigating to RouteScreenforAgent anyway');
+                        '⚠️ JSON parsing failed, navigating to RouteScreenforAgent anyway');
 
                     Navigator.push(
                       context,
@@ -393,13 +363,15 @@ class _LoginscreenState extends State<Loginscreen> {
                           builder: (context) => const RoutescreenforAgent()),
                     );
                   }
-                } catch (e) {
-                  print('❌ Error in session HTTP request: $e');
+                } else {
+                  print(
+                      '❌ Session response status code: ${sessionResponse.statusCode}');
+                  print('❌ Session response body: ${sessionResponse.body}');
 
-                  // On HTTP error, still navigate with isDriver = false
+                  // On session request failure, still navigate with isDriver = false
                   await updateDriverField(false);
                   print(
-                      '⚠️ Session HTTP request failed, navigating to RouteScreenforAgent anyway');
+                      '⚠️ Session request failed, navigating to RouteScreenforAgent anyway');
 
                   Navigator.push(
                     context,
@@ -407,26 +379,18 @@ class _LoginscreenState extends State<Loginscreen> {
                         builder: (context) => const RoutescreenforAgent()),
                   );
                 }
-              } else {
-                // Show dialog for invalid users (non-agents)
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text('Access Denied'),
-                      content: Text(
-                          'This is an agent login screen. Only agents (unitid: 5, 10, 18) can access this application.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text('OK'),
-                        ),
-                      ],
-                    );
-                  },
+              } catch (e) {
+                print('❌ Error in session HTTP request: $e');
+
+                // On HTTP error, still navigate with isDriver = false
+                await updateDriverField(false);
+                print(
+                    '⚠️ Session HTTP request failed, navigating to RouteScreenforAgent anyway');
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const RoutescreenforAgent()),
                 );
               }
             }
@@ -641,6 +605,13 @@ class _LoginscreenState extends State<Loginscreen> {
                                   child: TextButton(
                                     onPressed: () {
                                       // TODO: Implement forgot password
+                                       Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ForgetPasswordScreen(),
+                                        ),
+                                      );
                                     },
                                     child: Text(
                                       'Forgot Password?',

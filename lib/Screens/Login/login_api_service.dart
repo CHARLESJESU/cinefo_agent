@@ -6,7 +6,7 @@ import 'package:production/variables.dart';
 /// Handles all API operations related to login functionality
 class LoginApiService {
   /// Get base URL configuration
-  Future<Map<String, dynamic>?> fetchBaseUrl() async {
+  Future<Map<String, dynamic>?> fetchBaseUrl(String mainbaseurl) async {
     try {
       final response = await http.post(
         processRequest,
