@@ -51,7 +51,8 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       });
       try {
         emailOrPhone = phoneController.text;
-        await LoginApiService.fetchBaseUrl(mainbaseurl);
+        final apiService = LoginApiService();
+        await apiService.fetchBaseUrl(mainbaseurl);
         final dynamic rawResult = await api.forgetpasswordapi();
 
         if (rawResult is Map<String, dynamic>) {
