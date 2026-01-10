@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:device_preview/device_preview.dart';
 
 import 'package:production/Screens/splash/splashscreen.dart';
 
@@ -9,11 +12,17 @@ int? projectIdforattendance;
 int? productionTypeIdforattendance;
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   IntimeSyncService().startSync(); // Start background FIFO sync at app startup
   runApp(
-   
-    MyApp(),
-
+    DevicePreview(
+      enabled: !kReleaseMode, // Disable device preview in release mode
+      builder: (context) => const MyApp(),
+    ),
   );
 }
 
@@ -22,6 +31,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
       navigatorObservers: [routeObserver],
       home: SplashScreen(),

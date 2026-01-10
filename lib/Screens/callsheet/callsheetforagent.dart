@@ -20,6 +20,25 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
   bool _isLoading = false;
   List<Map<String, dynamic>> callSheetData = [];
 
+  // Responsive helper methods
+  double getResponsiveWidth(double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(double baseFontSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseFontSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -200,38 +219,38 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
           backgroundColor: Colors.transparent,
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            title: const Text(
+            title: Text(
               "Call Sheets",
               style:
-              TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: getResponsiveFontSize(18)),
             ),
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
           body: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: EdgeInsets.all(getResponsiveSpacing(20.0)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 30),
+                  SizedBox(height: getResponsiveSpacing(30)),
                   // Call sheets list section
                   if (_isLoading)
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.all(40),
+                        padding: EdgeInsets.all(getResponsiveSpacing(40)),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(getResponsiveSpacing(15)),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.08),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              blurRadius: getResponsiveSpacing(6),
+                              offset: Offset(0, getResponsiveSpacing(2)),
                             ),
                           ],
                         ),
-                        child: const CircularProgressIndicator(
+                        child: CircularProgressIndicator(
                           color: Color(0xFF2B5682),
                         ),
                       ),
@@ -239,15 +258,15 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                   else if (callSheetData.isEmpty)
                     Center(
                       child: Container(
-                        padding: const EdgeInsets.all(40),
+                        padding: EdgeInsets.all(getResponsiveSpacing(40)),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(15),
+                          borderRadius: BorderRadius.circular(getResponsiveSpacing(15)),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.08),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                              blurRadius: getResponsiveSpacing(6),
+                              offset: Offset(0, getResponsiveSpacing(2)),
                             ),
                           ],
                         ),
@@ -255,14 +274,14 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                           children: [
                             Icon(
                               Icons.description_outlined,
-                              size: 60,
+                              size: getResponsiveFontSize(60),
                               color: Colors.grey[400],
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: getResponsiveSpacing(16)),
                             Text(
                               "No Call Sheets Available",
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: getResponsiveFontSize(16),
                                 fontWeight: FontWeight.w500,
                                 color: Colors.grey[600],
                               ),
@@ -277,12 +296,12 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                       children: [
                         // Call Sheets Section
                         if (callSheetData.isNotEmpty) ...[
-                          const Padding(
-                            padding: EdgeInsets.only(bottom: 12),
+                          Padding(
+                            padding: EdgeInsets.only(bottom: getResponsiveSpacing(12)),
                             child: Text(
                               "Call Sheets List",
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: getResponsiveFontSize(18),
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -294,7 +313,7 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                       ],
                     ),
                   // Add extra bottom padding to prevent content from being hidden by navigation
-                  const SizedBox(height: 100),
+                  SizedBox(height: getResponsiveSpacing(100)),
                 ],
               ),
             ),
@@ -328,16 +347,16 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: getResponsiveSpacing(12)),
+        padding: EdgeInsets.all(getResponsiveSpacing(16)),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(getResponsiveSpacing(12)),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              blurRadius: getResponsiveSpacing(4),
+              offset: Offset(0, getResponsiveSpacing(2)),
             ),
           ],
           border: Border.all(
@@ -350,7 +369,7 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
           children: [
             // Header with gradient background
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: getResponsiveSpacing(12), vertical: getResponsiveSpacing(8)),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
@@ -360,31 +379,31 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                     const Color(0xFF2E4B73).withOpacity(0.1),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(getResponsiveSpacing(8)),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       "Call Sheet #$callSheetNo",
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: getResponsiveFontSize(16),
                         color: Color(0xFF2B5682),
                       ),
                     ),
                   ),
                   Container(
                     padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    EdgeInsets.symmetric(horizontal: getResponsiveSpacing(8), vertical: getResponsiveSpacing(4)),
                     decoration: BoxDecoration(
                       color: _getStatusColor(status).withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(6),
+                      borderRadius: BorderRadius.circular(getResponsiveSpacing(6)),
                     ),
                     child: Text(
                       status,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: getResponsiveFontSize(12),
                         fontWeight: FontWeight.w600,
                         color: _getStatusColor(status),
                       ),
@@ -393,20 +412,20 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                 ],
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: getResponsiveSpacing(12)),
             // Project Name
             Row(
               children: [
                 Icon(
                   Icons.movie,
-                  size: 16,
+                  size: getResponsiveFontSize(16),
                   color: Colors.grey[600],
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: getResponsiveSpacing(4)),
                 Text(
                   "Project: ",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: getResponsiveFontSize(14),
                     color: Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -415,7 +434,7 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                   child: Text(
                     projectName,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: getResponsiveFontSize(14),
                       color: Colors.grey[700],
                       fontWeight: FontWeight.w600,
                     ),
@@ -423,20 +442,20 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: getResponsiveSpacing(8)),
             // Call Sheet ID and Created Date
             Row(
               children: [
                 Icon(
                   Icons.badge,
-                  size: 16,
+                  size: getResponsiveFontSize(16),
                   color: Colors.grey[600],
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: getResponsiveSpacing(4)),
                 Text(
                   "ID: $callSheetId",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: getResponsiveFontSize(14),
                     color: Colors.grey[700],
                     fontWeight: FontWeight.w500,
                   ),
@@ -444,34 +463,34 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                 const Spacer(),
                 Icon(
                   Icons.calendar_today,
-                  size: 16,
+                  size: getResponsiveFontSize(16),
                   color: Colors.grey[600],
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: getResponsiveSpacing(4)),
                 Text(
                   createdDate,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: getResponsiveFontSize(14),
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF355E8C),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: getResponsiveSpacing(8)),
             // Shift Information
             Row(
               children: [
                 Icon(
                   Icons.access_time,
-                  size: 16,
+                  size: getResponsiveFontSize(16),
                   color: Colors.grey[600],
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: getResponsiveSpacing(4)),
                 Text(
                   "Shift: ",
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: getResponsiveFontSize(14),
                     color: Colors.grey[600],
                     fontWeight: FontWeight.w500,
                   ),
@@ -480,7 +499,7 @@ class _CallsheetforagentState extends State<Callsheetforagent> {
                   child: Text(
                     shift,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: getResponsiveFontSize(14),
                       color: Colors.grey[700],
                       fontWeight: FontWeight.w500,
                     ),

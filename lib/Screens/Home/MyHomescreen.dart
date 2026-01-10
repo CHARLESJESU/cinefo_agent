@@ -30,6 +30,25 @@ class _MyHomescreenState extends State<MyHomescreen> {
   String? _profileImage;
   List<Map<String, dynamic>> _callsheetList = [];
 
+  // Responsive helper methods
+  double getResponsiveWidth(double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(double baseFontSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseFontSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -274,7 +293,7 @@ class _MyHomescreenState extends State<MyHomescreen> {
                         backgroundImage: AssetImage(cinefoagent),
                         // backgroundImage: AssetImage(setting__logo),
 
-                        radius: 40,
+                        radius: getResponsiveFontSize(40),
                         backgroundColor: Colors.white,
                       ),
                     ),
@@ -285,13 +304,13 @@ class _MyHomescreenState extends State<MyHomescreen> {
                     leading: Icon(
                       Icons.person,
                       color: Colors.white,
-                      size: 24,
+                      size: getResponsiveFontSize(24),
                     ),
                     title: Text(
                       'View Profile',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: getResponsiveFontSize(16),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -310,8 +329,8 @@ class _MyHomescreenState extends State<MyHomescreen> {
                   Divider(
                     color: Colors.white.withOpacity(0.3),
                     thickness: 1,
-                    indent: 16,
-                    endIndent: 16,
+                    indent: getResponsiveSpacing(16),
+                    endIndent: getResponsiveSpacing(16),
                   ),
 
                   // Change Password
@@ -319,13 +338,13 @@ class _MyHomescreenState extends State<MyHomescreen> {
                     leading: Icon(
                       Icons.lock,
                       color: Colors.white,
-                      size: 24,
+                      size: getResponsiveFontSize(24),
                     ),
                     title: Text(
                       'Change Password',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: getResponsiveFontSize(16),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -344,8 +363,8 @@ class _MyHomescreenState extends State<MyHomescreen> {
                   Divider(
                     color: Colors.white.withOpacity(0.3),
                     thickness: 1,
-                    indent: 16,
-                    endIndent: 16,
+                    indent: getResponsiveSpacing(16),
+                    endIndent: getResponsiveSpacing(16),
                   ),
 
                   // Logout
@@ -353,13 +372,13 @@ class _MyHomescreenState extends State<MyHomescreen> {
                     leading: Icon(
                       Icons.logout,
                       color: Colors.white,
-                      size: 24,
+                      size: getResponsiveFontSize(24),
                     ),
                     title: Text(
                       'Logout',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: getResponsiveFontSize(16),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -372,20 +391,20 @@ class _MyHomescreenState extends State<MyHomescreen> {
                   Divider(
                     color: Colors.white.withOpacity(0.3),
                     thickness: 1,
-                    indent: 16,
-                    endIndent: 16,
+                    indent: getResponsiveSpacing(16),
+                    endIndent: getResponsiveSpacing(16),
                   ),
                   ListTile(
                     leading: Icon(
                       Icons.calendar_month,
                       color: Colors.white,
-                      size: 24,
+                      size: getResponsiveFontSize(24),
                     ),
                     title: Text(
                       'vSync',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: getResponsiveFontSize(16),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -408,11 +427,11 @@ class _MyHomescreenState extends State<MyHomescreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: Padding(
-              padding: const EdgeInsets.only(left: 8.0),
+              padding: EdgeInsets.only(left: getResponsiveSpacing(8.0)),
               child: Image.asset(
                 cinefologo,
-                width: 20,
-                height: 20,
+                width: getResponsiveSpacing(20),
+                height: getResponsiveSpacing(20),
                 fit: BoxFit.contain,
               ),
             ),
@@ -420,7 +439,7 @@ class _MyHomescreenState extends State<MyHomescreen> {
               IconButton(
                 icon: Icon(Icons.notifications),
                 color: Colors.white,
-                iconSize: 24,
+                iconSize: getResponsiveFontSize(24),
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('No new notifications')),
@@ -444,23 +463,23 @@ class _MyHomescreenState extends State<MyHomescreen> {
               physics: AlwaysScrollableScrollPhysics(),
               child: Padding(
                 padding: EdgeInsets.only(
-                    bottom: 100), // Add bottom padding to avoid navigation bar
+                    bottom: getResponsiveSpacing(100)), // Add bottom padding to avoid navigation bar
                 child: Column(
                   children: [
-                    SizedBox(height: 20), // Space from AppBar
+                    SizedBox(height: getResponsiveSpacing(20)), // Space from AppBar
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      padding: EdgeInsets.symmetric(horizontal: getResponsiveSpacing(30)),
                       child: Container(
-                        height: 130,
+                        height: getResponsiveHeight(16),
                         decoration: BoxDecoration(
                           color: Color(0xFF355E8C),
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(getResponsiveSpacing(20)),
                         ),
                         child: Row(
                           children: [
-                            const SizedBox(width: 7),
+                            SizedBox(width: getResponsiveSpacing(7)),
                             CircleAvatar(
-                              radius: 48,
+                              radius: getResponsiveFontSize(48),
                               backgroundColor: Colors.grey[300],
                               child: (_profileImage != null &&
                                   _profileImage!.isNotEmpty &&
@@ -468,46 +487,46 @@ class _MyHomescreenState extends State<MyHomescreen> {
                                   ? ClipOval(
                                 child: Image.network(
                                   _profileImage!,
-                                  width: 96,
-                                  height: 96,
+                                  width: getResponsiveFontSize(96),
+                                  height: getResponsiveFontSize(96),
                                   fit: BoxFit.cover,
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
                                     if (loadingProgress == null)
                                       return child;
                                     return Icon(Icons.person,
-                                        size: 48,
+                                        size: getResponsiveFontSize(48),
                                         color: Colors.grey[600]);
                                   },
                                   errorBuilder:
                                       (context, error, stackTrace) {
                                     return Icon(Icons.person,
-                                        size: 48,
+                                        size: getResponsiveFontSize(48),
                                         color: Colors.grey[600]);
                                   },
                                 ),
                               )
                                   : Icon(Icons.person,
-                                  size: 48, color: Colors.grey[600]),
+                                  size: getResponsiveFontSize(48), color: Colors.grey[600]),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: getResponsiveSpacing(12)),
                             Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              padding: EdgeInsets.symmetric(vertical: getResponsiveSpacing(20)),
                               child:
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(_managerName ?? '',
                                       style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: getResponsiveFontSize(14),
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white)),
                                   Text(_designation ?? '',
                                       style: TextStyle(
-                                          fontSize: 12, color: Colors.white70)),
+                                          fontSize: getResponsiveFontSize(12), color: Colors.white70)),
                                   Text(_mobileNumber ?? '',
                                       style: TextStyle(
-                                          fontSize: 12, color: Colors.white70)),
+                                          fontSize: getResponsiveFontSize(12), color: Colors.white70)),
                                 ],
                               ),
                             )
@@ -515,7 +534,7 @@ class _MyHomescreenState extends State<MyHomescreen> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20), // Space between containers
+                    SizedBox(height: getResponsiveSpacing(20)), // Space between containers
                     // Avengers: Endgame container (different design)
                     //container 2
                     // Padding(

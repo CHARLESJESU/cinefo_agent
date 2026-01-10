@@ -23,13 +23,32 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
   List<AttendanceEntry> reportData = [];
   bool isLoading = true;
 
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375); // 375 is base width (iPhone SE)
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   Future<void> reportsscreen() async {
     print(widget.maincallsheetid);
-    print(agentunitid);
+   
     print(globalloginData?['vsid'] ?? '');
     await fetchloginDataFromSqlite();
     final payload = {
-      "unitid": agentunitid,
+      "unitid": unitid,
       "callsheetid": widget.maincallsheetid,
       "vmid": 0,
     };
@@ -46,6 +65,9 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
         },
         body: jsonEncode(payload),
       );
+
+      checkSessionExpiration(response.body);
+
       if (response.statusCode == 200) {
         print("${response.body}✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ✅ ");
         final decoded = jsonDecode(response.body);
@@ -111,25 +133,33 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20),
+              SizedBox(height: getResponsiveSpacing(context, 20)),
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 80,
+                height: getResponsiveHeight(context, 10),
                 color: Colors.white,
                 child: Padding(
-                  padding: EdgeInsets.only(left: 30, top: 20),
+                  padding: EdgeInsets.only(
+                    left: getResponsiveSpacing(context, 30),
+                    top: getResponsiveSpacing(context, 20),
+                  ),
                   child: Row(
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: Icon(Icons.arrow_back),
+                        child: Icon(
+                          Icons.arrow_back,
+                          size: getResponsiveFontSize(context, 24),
+                        ),
                       ),
-                      SizedBox(width: 20),
-                      Text(
-                        "Callsheet Attendance Details",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                      SizedBox(width: getResponsiveSpacing(context, 20)),
+                      Flexible(
+                        child: Text(
+                          "Callsheet Attendance Details",
+                          style: TextStyle(
+                            fontSize: getResponsiveFontSize(context, 14),
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
@@ -137,52 +167,73 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 20, right: 20, top: 20),
+                padding: EdgeInsets.only(
+                  left: getResponsiveSpacing(context, 20),
+                  right: getResponsiveSpacing(context, 20),
+                  top: getResponsiveSpacing(context, 20),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      height: 50,
+                      height: getResponsiveHeight(context, 6.5),
                       decoration: BoxDecoration(
                         color: Color.fromRGBO(228, 215, 248, 1),
                         border: Border.all(
                           color: Color.fromRGBO(131, 77, 218, 1),
+                          width: getResponsiveSpacing(context, 1),
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          getResponsiveSpacing(context, 8),
                         ),
                       ),
                       child: Row(
                         children: [
-                          SizedBox(width: 10),
+                          SizedBox(width: getResponsiveSpacing(context, 10)),
                           Expanded(
                             flex: 2,
-                            child: Text('Code',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(131, 77, 218, 1),
-                                )),
+                            child: Text(
+                              'Code',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: getResponsiveFontSize(context, 13),
+                                color: Color.fromRGBO(131, 77, 218, 1),
+                              ),
+                            ),
                           ),
                           Expanded(
                             flex: 3,
-                            child: Text('Name',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(131, 77, 218, 1),
-                                )),
+                            child: Text(
+                              'Name',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: getResponsiveFontSize(context, 13),
+                                color: Color.fromRGBO(131, 77, 218, 1),
+                              ),
+                            ),
                           ),
                           Expanded(
-                            child: Text('In Time',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(131, 77, 218, 1),
-                                )),
+                            child: Text(
+                              'In Time',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: getResponsiveFontSize(context, 13),
+                                color: Color.fromRGBO(131, 77, 218, 1),
+                              ),
+                            ),
                           ),
-                          SizedBox(width: 20),
+                          SizedBox(width: getResponsiveSpacing(context, 10)),
                           Expanded(
-                            child: Text('Out Time',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(131, 77, 218, 1),
-                                )),
+                            child: Text(
+                              'Out Time',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: getResponsiveFontSize(context, 13),
+                                color: Color.fromRGBO(131, 77, 218, 1),
+                              ),
+                            ),
                           ),
+                          SizedBox(width: getResponsiveSpacing(context, 10)),
                         ],
                       ),
                     ),
@@ -191,24 +242,61 @@ class _CallsheetmembersState extends State<Callsheetmembers> {
               ),
               Expanded(
                 child: isLoading
-                    ? Center(child: CircularProgressIndicator())
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: getResponsiveSpacing(context, 4),
+                        ),
+                      )
                     : ListView.builder(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: getResponsiveSpacing(context, 20),
+                          vertical: getResponsiveSpacing(context, 10),
+                        ),
                         itemCount: reportData.length,
                         itemBuilder: (context, index) {
                           final entry = reportData[index];
                           return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            padding: EdgeInsets.symmetric(
+                              vertical: getResponsiveSpacing(context, 10),
+                            ),
                             child: Row(
                               children: [
                                 Expanded(
-                                    flex: 2, child: Text(entry.code ?? "--")),
+                                  flex: 2,
+                                  child: Text(
+                                    entry.code ?? "--",
+                                    style: TextStyle(
+                                      fontSize: getResponsiveFontSize(context, 13),
+                                    ),
+                                  ),
+                                ),
                                 Expanded(
-                                    flex: 3, child: Text(entry.memberName)),
-                                Expanded(child: Text(entry.inTime ?? "--")),
-                                SizedBox(width: 20),
-                                Expanded(child: Text(entry.outTime ?? "--")),
+                                  flex: 3,
+                                  child: Text(
+                                    entry.memberName,
+                                    style: TextStyle(
+                                      fontSize: getResponsiveFontSize(context, 13),
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    entry.inTime ?? "--",
+                                    style: TextStyle(
+                                      fontSize: getResponsiveFontSize(context, 13),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: getResponsiveSpacing(context, 10)),
+                                Expanded(
+                                  child: Text(
+                                    entry.outTime ?? "--",
+                                    style: TextStyle(
+                                      fontSize: getResponsiveFontSize(context, 13),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: getResponsiveSpacing(context, 10)),
                               ],
                             ),
                           );

@@ -35,6 +35,25 @@ class _IntimeScreenBodyState extends State<_IntimeScreenBody> {
   // Threshold to auto-submit (adjust if needed)
   static const int _autoSubmitLength = 10;
 
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   void updateDebugMessage(String msg) {
     if (mounted) {
       setState(() {
@@ -143,10 +162,20 @@ class _IntimeScreenBodyState extends State<_IntimeScreenBody> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text("Out-time", style: TextStyle(color: Colors.black)),
+        title: Text(
+          "Out-time",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: getResponsiveFontSize(context, 18),
+          ),
+        ),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: getResponsiveFontSize(context, 24),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -160,10 +189,17 @@ class _IntimeScreenBodyState extends State<_IntimeScreenBody> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(debugMessage),
+                  Text(
+                    debugMessage,
+                    style: TextStyle(
+                      fontSize: getResponsiveFontSize(context, 14),
+                    ),
+                  ),
                   // Numeric-only, hidden (opacity 0) RFID text box remains for compatibility
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getResponsiveSpacing(context, 24),
+                    ),
                     child: Opacity(
                       opacity: 0.0,
                       child: TextField(
@@ -177,12 +213,22 @@ class _IntimeScreenBodyState extends State<_IntimeScreenBody> {
                           labelText: 'RFID',
                           hintText: 'Enter numeric RFID',
                           border: OutlineInputBorder(),
+                          labelStyle: TextStyle(
+                            fontSize: getResponsiveFontSize(context, 14),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Image.asset('assets/markattendance.png'),
-                  const SizedBox(height: 20),
+                  Container(
+                    width: getResponsiveWidth(context, 80),
+                    height: getResponsiveHeight(context, 40),
+                    child: Image.asset(
+                      'assets/markattendance.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  SizedBox(height: getResponsiveSpacing(context, 20)),
                   Consumer<NFCNotifier>(
                     builder: (context, provider, _) {
                       // Provider-originated RFID should still fill the field when available
@@ -226,11 +272,12 @@ class _IntimeScreenBodyState extends State<_IntimeScreenBody> {
                       }
 
                       if (provider.isProcessing) {
-                        return const Text(
+                        return Text(
                           'Please hold the card near',
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
+                            fontSize: getResponsiveFontSize(context, 16),
                           ),
                         );
                       }

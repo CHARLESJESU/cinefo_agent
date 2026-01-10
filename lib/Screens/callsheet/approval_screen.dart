@@ -25,6 +25,25 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
   Database? _database;
   bool _isLoading = false; // new: show spinner while refreshing
 
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -117,7 +136,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
             }
           }
 
-          if (statusId == 2) {
+          if (statusId == 1) {
             setState(() {
               print("success charles");
               approvalid = 1;
@@ -215,31 +234,37 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
               children: [
                 // Custom App Bar
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: getResponsiveSpacing(context, 16),
+                    vertical: getResponsiveSpacing(context, 12),
+                  ),
                   child: Row(
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(
+                            getResponsiveSpacing(context, 8),
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(
+                              getResponsiveSpacing(context, 10),
+                            ),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.arrow_back_ios_new,
                             color: Colors.white,
-                            size: 20,
+                            size: getResponsiveFontSize(context, 20),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
-                      const Text(
+                      SizedBox(width: getResponsiveSpacing(context, 16)),
+                      Text(
                         'Approval Status',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 20,
+                          fontSize: getResponsiveFontSize(context, 20),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -250,7 +275,7 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                 Expanded(
                   child: Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(24.0),
+                      padding: EdgeInsets.all(getResponsiveSpacing(context, 24)),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -258,34 +283,34 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
                         children: [
                           // Animated waiting icon container
                           Container(
-                            width: 120,
-                            height: 120,
+                            width: getResponsiveSpacing(context, 120),
+                            height: getResponsiveSpacing(context, 120),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.15),
                               shape: BoxShape.circle,
                               border: Border.all(
                                 color: Colors.white.withOpacity(0.3),
-                                width: 2,
+                                width: getResponsiveSpacing(context, 2),
                               ),
                             ),
                             child: Center(
                               child: _isLoading
-                                  ? const SizedBox(
-                                      width: 50,
-                                      height: 50,
+                                  ? SizedBox(
+                                      width: getResponsiveSpacing(context, 50),
+                                      height: getResponsiveSpacing(context, 50),
                                       child: CircularProgressIndicator(
                                         color: Colors.white,
-                                        strokeWidth: 3,
+                                        strokeWidth: getResponsiveSpacing(context, 3),
                                       ),
                                     )
-                                  : const Icon(
+                                  : Icon(
                                       Icons.hourglass_top_rounded,
-                                      size: 60,
+                                      size: getResponsiveFontSize(context, 60),
                                       color: Colors.white,
                                     ),
                             ),
                           ),
-                          const SizedBox(height: 32),
+                          SizedBox(height: getResponsiveSpacing(context, 32)),
                           // Status badge
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -444,8 +469,11 @@ class _ApprovalScreenState extends State<ApprovalScreen> {
         width: double.infinity,
         height: double.infinity,
         decoration: AppColors.gradientBackground,
-        child: const Center(
-          child: CircularProgressIndicator(color: Colors.white),
+        child: Center(
+          child: CircularProgressIndicator(
+            color: Colors.white,
+            strokeWidth: getResponsiveSpacing(context, 4),
+          ),
         ),
       ),
     );

@@ -31,6 +31,25 @@ class _LoginscreenState extends State<Loginscreen> {
   String? ProfileImage;
   int? vmid;
 
+  // Responsive helper methods
+  double getResponsiveWidth(double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(double baseFontSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseFontSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   // Wrapper methods to maintain compatibility with existing code
   void showmessage(BuildContext context, String message, String ok) {
     LoginDialogHelper.showMessage(context, message, ok);
@@ -497,21 +516,21 @@ class _LoginscreenState extends State<Loginscreen> {
           SafeArea(
             child: Column(
               children: [
-                SizedBox(height: screenHeight * 0.04),
+                SizedBox(height: getResponsiveHeight(4)),
                 // Logo/Header
                 Center(
                   child: Column(
                     children: [
                       Container(
-                        width: screenWidth * 0.22,
-                        height: screenWidth * 0.22,
+                        width: getResponsiveWidth(22),
+                        height: getResponsiveWidth(22),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black12,
-                              blurRadius: 10,
-                              offset: Offset(0, 4),
+                              blurRadius: getResponsiveSpacing(10),
+                              offset: Offset(0, getResponsiveSpacing(4)),
                             ),
                           ],
                         ),
@@ -524,13 +543,13 @@ class _LoginscreenState extends State<Loginscreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 12),
+                      SizedBox(height: getResponsiveSpacing(12)),
                       Text(
                    
                         'Agent Login',
                         
                         style: TextStyle(
-                          fontSize: screenWidth * 0.055,
+                          fontSize: getResponsiveFontSize(20),
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF164AE9),
                           letterSpacing: 1.2,
@@ -544,16 +563,16 @@ class _LoginscreenState extends State<Loginscreen> {
                     child: SingleChildScrollView(
                       child: Padding(
                         padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.07),
+                            horizontal: getResponsiveWidth(7)),
                         child: Card(
-                          elevation: 8,
+                          elevation: getResponsiveSpacing(8),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.circular(getResponsiveSpacing(24)),
                           ),
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                              horizontal: screenWidth * 0.06,
-                              vertical: screenHeight * 0.04,
+                              horizontal: getResponsiveWidth(6),
+                              vertical: getResponsiveHeight(4),
                             ),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
@@ -561,12 +580,12 @@ class _LoginscreenState extends State<Loginscreen> {
                                 Text(
                                   "Login to Continue",
                                   style: TextStyle(
-                                    fontSize: screenWidth * 0.05,
+                                    fontSize: getResponsiveFontSize(18),
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),
                                 ),
-                                SizedBox(height: screenHeight * 0.04),
+                                SizedBox(height: getResponsiveHeight(4)),
                                 TextFormField(
                                   controller: loginmobilenumber,
                                   keyboardType: TextInputType.phone,
@@ -575,16 +594,16 @@ class _LoginscreenState extends State<Loginscreen> {
                                     prefixIcon: Icon(Icons.phone,
                                         color: Color(0xFF164AE9)),
                                     labelStyle: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: getResponsiveFontSize(15),
                                       fontWeight: FontWeight.w500,
                                       color: Colors.grey,
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(getResponsiveSpacing(12)),
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: screenHeight * 0.025),
+                                SizedBox(height: getResponsiveHeight(2.5)),
                                 TextFormField(
                                   controller: loginpassword,
                                   keyboardType: TextInputType.visiblePassword,
@@ -594,12 +613,12 @@ class _LoginscreenState extends State<Loginscreen> {
                                     prefixIcon: Icon(Icons.lock,
                                         color: Color(0xFF164AE9)),
                                     labelStyle: TextStyle(
-                                      fontSize: 15,
+                                      fontSize: getResponsiveFontSize(15),
                                       fontWeight: FontWeight.w500,
                                       color: Colors.grey,
                                     ),
                                     border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(getResponsiveSpacing(12)),
                                     ),
                                     suffixIcon: IconButton(
                                       icon: Icon(
@@ -616,7 +635,7 @@ class _LoginscreenState extends State<Loginscreen> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: 8),
+                                SizedBox(height: getResponsiveSpacing(8)),
                                 Align(
                                   alignment: Alignment.centerRight,
                                   child: TextButton(
@@ -632,10 +651,10 @@ class _LoginscreenState extends State<Loginscreen> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: screenHeight * 0.03),
+                                SizedBox(height: getResponsiveHeight(3)),
                                 SizedBox(
                                   width: double.infinity,
-                                  height: screenHeight * 0.07,
+                                  height: getResponsiveHeight(7),
                                   child: ElevatedButton(
                                     onPressed: _isLoading
                                         ? null
@@ -643,9 +662,9 @@ class _LoginscreenState extends State<Loginscreen> {
                                             loginr();
                                           },
                                     style: ElevatedButton.styleFrom(
-                                      elevation: 4,
+                                      elevation: getResponsiveSpacing(4),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(18),
+                                        borderRadius: BorderRadius.circular(getResponsiveSpacing(18)),
                                       ),
                                       padding: EdgeInsets.zero,
                                       backgroundColor: null,
@@ -667,7 +686,7 @@ class _LoginscreenState extends State<Loginscreen> {
                                             Color(0xFF4F8CFF),
                                           ],
                                         ),
-                                        borderRadius: BorderRadius.circular(18),
+                                        borderRadius: BorderRadius.circular(getResponsiveSpacing(18)),
                                       ),
                                       child: Container(
                                         alignment: Alignment.center,
@@ -684,12 +703,12 @@ class _LoginscreenState extends State<Loginscreen> {
                                                     style: TextStyle(
                                                       color: Colors.white,
                                                       fontSize:
-                                                          screenWidth * 0.045,
+                                                          getResponsiveFontSize(16),
                                                       fontWeight:
                                                           FontWeight.w600,
                                                     ),
                                                   ),
-                                                  SizedBox(width: 8),
+                                                  SizedBox(width: getResponsiveSpacing(8)),
                                                   Icon(Icons.login,
                                                       color: Colors.white),
                                                 ],
@@ -707,11 +726,11 @@ class _LoginscreenState extends State<Loginscreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0, top: 8.0),
+                  padding: EdgeInsets.only(bottom: getResponsiveSpacing(12.0), top: getResponsiveSpacing(8.0)),
                   child: Text(
                     'V.4.0.2',
                     style: TextStyle(
-                      fontSize: screenWidth * 0.035,
+                      fontSize: getResponsiveFontSize(13),
                       color: Colors.grey,
                       fontWeight: FontWeight.w500,
                     ),

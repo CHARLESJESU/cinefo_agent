@@ -1,10 +1,24 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:production/variables.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
-import 'package:production/variables.dart';
+import 'package:production/sessionexpired.dart';
 // Function to update trip status
+
+void checkSessionExpiration(String responseBody) {
+  try {
+    final decoded = jsonDecode(responseBody);
+    if (decoded is Map && decoded['errordescription'] == "Session Expired") {
+      navigatorKey.currentState?.push(
+        MaterialPageRoute(builder: (context) => const Sessionexpired()),
+      );
+    }
+  } catch (e) {
+    // If JSON parsing fails, ignore
+  }
+}
 
 Future<void> fetchloginDataFromSqlite() async {
   try {
@@ -53,6 +67,8 @@ Future<Map<String, dynamic>> agentreportapi() async {
     print('🚗 driverreportapi Status API Response Status: ${payload}');
     print(
         '🚗 driverreportapi Status API Response Body: ${tripstatusresponse.body}');
+
+    checkSessionExpiration(tripstatusresponse.body);
 
     return {
       'statusCode': tripstatusresponse.statusCode,

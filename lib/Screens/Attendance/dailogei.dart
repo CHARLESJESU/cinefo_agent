@@ -66,6 +66,25 @@ class _CountdownDialog extends StatefulWidget {
 }
 
 class _CountdownDialogState extends State<_CountdownDialog> {
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   Future<void> saveIntimeToSQLite(Map<String, dynamic> data) async {
     print('DEBUG: saveIntimeToSQLite started');
     try {
@@ -358,7 +377,7 @@ class _CountdownDialogState extends State<_CountdownDialog> {
     final isAlreadyMarked = responseMessage == "Attendance already marked";
 
     return AlertDialog(
-      contentPadding: const EdgeInsets.all(16.0),
+      contentPadding: EdgeInsets.all(getResponsiveSpacing(context, 16)),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -367,17 +386,24 @@ class _CountdownDialogState extends State<_CountdownDialog> {
               child: widget.vcid.isNotEmpty
                   ? Image.network(
                       imageUrl,
-                      width: 100,
-                      height: 100,
+                      width: getResponsiveSpacing(context, 100),
+                      height: getResponsiveSpacing(context, 100),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.person,
-                            size: 60, color: Colors.grey);
+                        return Icon(
+                          Icons.person,
+                          size: getResponsiveFontSize(context, 60),
+                          color: Colors.grey,
+                        );
                       },
                     )
-                  : const Icon(Icons.person, size: 60, color: Colors.grey),
+                  : Icon(
+                      Icons.person,
+                      size: getResponsiveFontSize(context, 60),
+                      color: Colors.grey,
+                    ),
             ),
-          const SizedBox(height: 10),
+          SizedBox(height: getResponsiveSpacing(context, 10)),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -385,9 +411,10 @@ class _CountdownDialogState extends State<_CountdownDialog> {
                 Icon(
                   Icons.warning,
                   color: Colors.orange,
-                  size: 20,
+                  size: getResponsiveFontSize(context, 20),
                 ),
-              if (isAlreadyMarked) const SizedBox(width: 8),
+              if (isAlreadyMarked)
+                SizedBox(width: getResponsiveSpacing(context, 8)),
               Flexible(
                 child: Text(
                   responseMessage.isNotEmpty ? responseMessage : widget.message,
@@ -396,15 +423,17 @@ class _CountdownDialogState extends State<_CountdownDialog> {
                     color: isAlreadyMarked ? Colors.orange : Colors.black,
                     fontWeight:
                         isAlreadyMarked ? FontWeight.bold : FontWeight.normal,
+                    fontSize: getResponsiveFontSize(context, 14),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: getResponsiveSpacing(context, 10)),
           if (_isloading)
-            const CircularProgressIndicator(
+            CircularProgressIndicator(
               color: Colors.black,
+              strokeWidth: getResponsiveSpacing(context, 3),
             ),
         ],
       ),
@@ -538,6 +567,9 @@ class IntimeSyncService {
         }
 
         print('IntimeSyncService: POST statusCode=\\${response.statusCode}');
+
+        checkSessionExpiration(response.body);
+
         if (response.statusCode == 200 
        ) {
           print(

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:production/ApiCalls/apicall.dart';
 import 'package:production/Screens/Login/login_dialog_helper.dart';
 import 'package:production/sessionexpired.dart';
 import 'package:production/variables.dart';
@@ -17,6 +18,25 @@ class _ChangepasswordState extends State<Changepassword> {
   TextEditingController currentpassword = TextEditingController();
   TextEditingController newpassword = TextEditingController();
   bool isloading = false;
+
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
 
   Future<void> changepassword() async {
     setState(() {
@@ -40,6 +60,8 @@ class _ChangepasswordState extends State<Changepassword> {
         "newpassword": newpassword.text
       }),
     );
+
+    checkSessionExpiration(response.body);
 
     if (response.statusCode == 200) {
       setState(() {
@@ -110,25 +132,32 @@ class _ChangepasswordState extends State<Changepassword> {
         child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 10, left: 15, right: 15),
+              padding: EdgeInsets.only(
+                top: getResponsiveSpacing(context, 10),
+                left: getResponsiveSpacing(context, 15),
+                right: getResponsiveSpacing(context, 15),
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(2.0),
+                    padding: EdgeInsets.all(getResponsiveSpacing(context, 2)),
                     child: GestureDetector(
                         onTap: () {
                           Navigator.pop(context); // Pop screen
                         },
-                        child: Icon(Icons.arrow_back_ios)),
+                        child: Icon(
+                          Icons.arrow_back_ios,
+                          size: getResponsiveFontSize(context, 20),
+                        )),
                   ),
-                  const SizedBox(width: 10),
+                  SizedBox(width: getResponsiveSpacing(context, 10)),
                   Text(
                     'Change Password',
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
-                      fontSize: 18,
+                      fontSize: getResponsiveFontSize(context, 18),
                     ),
                   ),
                   const Spacer(),
@@ -137,66 +166,83 @@ class _ChangepasswordState extends State<Changepassword> {
             ),
             SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.only(top: 75, left: 20, right: 20),
+                padding: EdgeInsets.only(
+                  top: getResponsiveSpacing(context, 75),
+                  left: getResponsiveSpacing(context, 20),
+                  right: getResponsiveSpacing(context, 20),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Create New Password',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, 18),
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                    const Text(
+                    SizedBox(height: getResponsiveSpacing(context, 10)),
+                    Text(
                       'Your new password must be different from previous used passwords',
-                      style:
-                          TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, 15),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    const Text(
+                    SizedBox(height: getResponsiveSpacing(context, 20)),
+                    Text(
                       'Enter Current Password',
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, 14),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: getResponsiveSpacing(context, 10)),
                     _buildPasswordField(controller: currentpassword),
-                    const SizedBox(height: 20),
-                    const Text(
+                    SizedBox(height: getResponsiveSpacing(context, 20)),
+                    Text(
                       'Enter New Password',
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, 14),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: getResponsiveSpacing(context, 10)),
                     _buildPasswordField(controller: newpassword),
-                    const SizedBox(height: 20),
-                    const Text(
+                    SizedBox(height: getResponsiveSpacing(context, 20)),
+                    Text(
                       'Re-enter Password',
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                      style: TextStyle(
+                        fontSize: getResponsiveFontSize(context, 14),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: getResponsiveSpacing(context, 10)),
                     _buildPasswordField(controller: reneterpassword),
-                    const SizedBox(height: 60),
+                    SizedBox(height: getResponsiveSpacing(context, 60)),
                     GestureDetector(
                       onTap: _submitData,
                       child: Container(
                         width: MediaQuery.of(context).size.width,
-                        height: 55,
+                        height: getResponsiveHeight(context, 7),
                         decoration: BoxDecoration(
                           color: Colors.deepPurple,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(
+                            getResponsiveSpacing(context, 10),
+                          ),
                         ),
                         child: Center(
                           child: isloading
                               ? CircularProgressIndicator(
                                   color: Colors.white,
+                                  strokeWidth: getResponsiveSpacing(context, 3),
                                 )
                               : Text(
                                   'Change Password',
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w700,
-                                    fontSize: 18,
+                                    fontSize: getResponsiveFontSize(context, 18),
                                   ),
                                 ),
                         ),
@@ -214,28 +260,47 @@ class _ChangepasswordState extends State<Changepassword> {
 
   Widget _buildPasswordField({required TextEditingController controller}) {
     return SizedBox(
-      height: 50,
+      height: getResponsiveHeight(context, 6.5),
       child: TextFormField(
         controller: controller,
         obscureText: true,
+        style: TextStyle(fontSize: getResponsiveFontSize(context, 14)),
         decoration: InputDecoration(
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(
+              getResponsiveSpacing(context, 10),
+            ),
+            borderSide: BorderSide(
+              color: Colors.grey,
+              width: getResponsiveSpacing(context, 1),
+            ),
           ),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.grey),
+            borderRadius: BorderRadius.circular(
+              getResponsiveSpacing(context, 10),
+            ),
+            borderSide: BorderSide(
+              color: Colors.grey,
+              width: getResponsiveSpacing(context, 1),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.blue),
+            borderRadius: BorderRadius.circular(
+              getResponsiveSpacing(context, 10),
+            ),
+            borderSide: BorderSide(
+              color: Colors.blue,
+              width: getResponsiveSpacing(context, 2),
+            ),
           ),
           labelText: controller == currentpassword
               ? 'Current Password'
               : controller == newpassword
                   ? 'New Password'
                   : 'Re-enter Password',
+          labelStyle: TextStyle(
+            fontSize: getResponsiveFontSize(context, 14),
+          ),
         ),
         onEditingComplete: () {
           FocusScope.of(context).unfocus();

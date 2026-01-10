@@ -17,6 +17,25 @@ class _ProfileInfoScreenState extends State<Profilesccreen> {
   File? _profileImage;
   Map<String, dynamic>? loginData;
 
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   Future<void> _pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -41,18 +60,31 @@ class _ProfileInfoScreenState extends State<Profilesccreen> {
 
   Widget buildProfileField(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: getResponsiveSpacing(context, 16),
+        vertical: getResponsiveSpacing(context, 6),
+      ),
       child: Row(
         children: [
           SizedBox(
-              width: 100,
-              child: Text(label, style: TextStyle(color: Colors.white70))),
-          SizedBox(width: 16), // Add horizontal space between label and value
+            width: getResponsiveWidth(context, 26),
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: getResponsiveFontSize(context, 14),
+              ),
+            ),
+          ),
+          SizedBox(width: getResponsiveSpacing(context, 16)),
           Expanded(
             child: Text(
               value,
-              style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+                fontSize: getResponsiveFontSize(context, 14),
+              ),
             ),
           ),
         ],
@@ -74,22 +106,35 @@ class _ProfileInfoScreenState extends State<Profilesccreen> {
         backgroundColor: AppColors.primaryLight,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: getResponsiveFontSize(context, 20),
+          ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title:
-            const Text('Profile Info', style: TextStyle(color: Colors.white)),
+        title: Text(
+          'Profile Info',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: getResponsiveFontSize(context, 18),
+          ),
+        ),
       ),
       body: loginData == null
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(
+                strokeWidth: getResponsiveSpacing(context, 4),
+              ),
+            )
           : Column(
               children: [
-                const SizedBox(height: 10),
+                SizedBox(height: getResponsiveSpacing(context, 10)),
                 Stack(
                   alignment: Alignment.bottomRight,
                   children: [
                     CircleAvatar(
-                      radius: 55,
+                      radius: getResponsiveSpacing(context, 55),
                       backgroundColor: Colors.white,
                       backgroundImage: _profileImage != null
                           ? FileImage(_profileImage!)
@@ -98,25 +143,33 @@ class _ProfileInfoScreenState extends State<Profilesccreen> {
                     Positioned(
                       child: GestureDetector(
                         onTap: _pickImage,
-                        child: const CircleAvatar(
-                          radius: 15,
+                        child: CircleAvatar(
+                          radius: getResponsiveSpacing(context, 15),
                           backgroundColor: Colors.blue,
-                          child:
-                              Icon(Icons.edit, size: 15, color: Colors.white),
+                          child: Icon(
+                            Icons.edit,
+                            size: getResponsiveFontSize(context, 15),
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: getResponsiveSpacing(context, 8)),
                 Text(
                   loginData?["manager_name"] ?? '',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold),
+                    color: Colors.white,
+                    fontSize: getResponsiveFontSize(context, 18),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                const Divider(color: Colors.white24, height: 30, thickness: 1),
+                Divider(
+                  color: Colors.white24,
+                  height: getResponsiveSpacing(context, 30),
+                  thickness: getResponsiveSpacing(context, 1),
+                ),
                 buildProfileField('Name', loginData?["manager_name"] ?? ''),
                 buildProfileField('Mobile', loginData?["mobile_number"] ?? ''),
                 buildProfileField('Designation', loginData?["subUnitName"] ?? ''),

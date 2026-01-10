@@ -36,6 +36,25 @@ class _IntimeScreenBodyState extends State<_IntimeScreenBody> {
   // Threshold to auto-submit (adjust if needed)
   static const int _autoSubmitLength = 10;
 
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   void updateDebugMessage(String msg) {
     if (mounted) {
       setState(() {
@@ -156,10 +175,20 @@ class _IntimeScreenBodyState extends State<_IntimeScreenBody> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: const Text("In-time", style: TextStyle(color: Colors.black)),
+        title: Text(
+          "In-time",
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: getResponsiveFontSize(context, 18),
+          ),
+        ),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back,
+            color: Colors.black,
+            size: getResponsiveFontSize(context, 24),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -173,38 +202,58 @@ class _IntimeScreenBodyState extends State<_IntimeScreenBody> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(debugMessage),
+                  Text(
+                    debugMessage,
+                    style: TextStyle(
+                      fontSize: getResponsiveFontSize(context, 14),
+                    ),
+                  ),
 
                   // Display the buffer in a read-only TextField so soft keyboard won't appear
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                    child: Opacity(opacity: 0.0,child: TextField(
-                      controller: _rfidController,
-                      focusNode: _rfidFocusNode,
-                      readOnly: true, // prevents soft keyboard from opening
-                      showCursor: true,
-                      enableInteractiveSelection: false,
-                      decoration: InputDecoration(
-                        labelText: 'RFID',
-                        hintText: 'Waiting for hardware input...',
-                        border: OutlineInputBorder(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: getResponsiveSpacing(context, 24),
+                    ),
+                    child: Opacity(
+                      opacity: 0.0,
+                      child: TextField(
+                        controller: _rfidController,
+                        focusNode: _rfidFocusNode,
+                        readOnly: true, // prevents soft keyboard from opening
+                        showCursor: true,
+                        enableInteractiveSelection: false,
+                        decoration: InputDecoration(
+                          labelText: 'RFID',
+                          hintText: 'Waiting for hardware input...',
+                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(
+                            fontSize: getResponsiveFontSize(context, 14),
+                          ),
+                        ),
                       ),
-                    ),)
-
+                    ),
                   ),
 
-                  Image.asset('assets/markattendance.png'),
-                  const SizedBox(height: 20),
+                  Container(
+                    width: getResponsiveWidth(context, 80),
+                    height: getResponsiveHeight(context, 40),
+                    child: Image.asset(
+                      'assets/markattendance.png',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  SizedBox(height: getResponsiveSpacing(context, 20)),
 
                   Consumer<NFCNotifier>(
                     builder: (context, provider, _) {
                       // Still keep NFC provider messages working as before
                       if (provider.isProcessing) {
-                        return const Text(
+                        return Text(
                           'Please hold the card near',
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.bold,
+                            fontSize: getResponsiveFontSize(context, 16),
                           ),
                         );
                       }

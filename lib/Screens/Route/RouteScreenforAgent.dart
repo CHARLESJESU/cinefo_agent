@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:production/Screens/Home/MyHomescreen.dart';
-import 'package:production/Screens/Trip/agenttripreport.dart';
 import 'package:production/Screens/callsheet/callsheetforagent.dart';
 
 import 'package:production/Screens/report/reportforcallsheet.dart';
@@ -20,6 +19,25 @@ class RoutescreenforAgent extends StatefulWidget {
 
 class _RoutescreenforAgentState extends State<RoutescreenforAgent> {
   int _currentIndex = 0;
+
+  // Responsive helper methods
+  double getResponsiveWidth(double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(double baseFontSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseFontSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
 
   @override
   void initState() {
@@ -41,33 +59,24 @@ class _RoutescreenforAgentState extends State<RoutescreenforAgent> {
       body: SafeArea(
         child: _getScreenWidget(_currentIndex),
       ),
-      // Align(
-      //   alignment: Alignment.bottomCenter,
-      //   child: SafeArea(
-      //     top: false,
-      //     child: SizedBox(
-      //       height: 70,
-      //       child: Stack(
-      //         children: [
+
+      
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Color(0xFF355E8C),
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home, size: getResponsiveFontSize(24)),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
+            icon: Icon(Icons.list, size: getResponsiveFontSize(24)),
             label: 'Callsheet',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
+            icon: Icon(Icons.calendar_month, size: getResponsiveFontSize(24)),
             label: 'Reports',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.trip_origin),
-          //   label: 'Trip',
-          // ),
+   
         ],
         currentIndex: _currentIndex,
         onTap: _onItemTapped,
@@ -75,6 +84,9 @@ class _RoutescreenforAgentState extends State<RoutescreenforAgent> {
         unselectedItemColor: Colors.white,
         showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
+        selectedFontSize: getResponsiveFontSize(12),
+        unselectedFontSize: getResponsiveFontSize(12),
+        iconSize: getResponsiveFontSize(24),
       ),
     );
   }

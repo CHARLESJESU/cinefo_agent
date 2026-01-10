@@ -15,6 +15,26 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Database? _database;
+
+  // Responsive helper methods
+  double getResponsiveWidth(double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(double baseFontSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseFontSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -161,15 +181,15 @@ class _SplashScreenState extends State<SplashScreen> {
                   children: [
                     // App Logo
                     Container(
-                      width: 120,
-                      height: 120,
+                      width: getResponsiveWidth(32),
+                      height: getResponsiveWidth(32),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.3),
-                            blurRadius: 15,
-                            offset: Offset(0, 8),
+                            blurRadius: getResponsiveSpacing(15),
+                            offset: Offset(0, getResponsiveSpacing(8)),
                           ),
                         ],
                       ),
@@ -182,7 +202,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       ),
                     ),
 
-                    SizedBox(height: 30),
+                    SizedBox(height: getResponsiveSpacing(30)),
 
                     // App Title
                     Text(
@@ -190,14 +210,14 @@ class _SplashScreenState extends State<SplashScreen> {
                       'Agent App',
 
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: getResponsiveFontSize(28),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         letterSpacing: 1.2,
                       ),
                     ),
 
-                    SizedBox(height: 50),
+                    SizedBox(height: getResponsiveSpacing(50)),
 
                     // Loading indicator and status
                   ],
@@ -207,11 +227,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
             // Version info
             Padding(
-              padding: const EdgeInsets.only(bottom: 20),
+              padding: EdgeInsets.only(bottom: getResponsiveSpacing(20)),
               child: Text(
                 'v.4.0.2',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: getResponsiveFontSize(14),
                   color: Colors.white.withOpacity(0.7),
                   fontWeight: FontWeight.w400,
                 ),

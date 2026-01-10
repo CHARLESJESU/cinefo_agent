@@ -8,7 +8,6 @@ TextEditingController loginpassword = TextEditingController();
 
 Map? loginresult;
 String? location;
-int agentunitid=18;
 String? locationofcharles;
 bool isoffline = false;
 Map? getdeviceidresponse;
@@ -49,11 +48,11 @@ int secondLeadRoleOtherLanguage = 0;
 // final processSessionRequest =
 //     Uri.parse('https://devvgate.vframework.in/vgateapi/processSessionRequest');
     final processRequest =
-    Uri.parse('https://vgate.vframework.in/vgateapi/processRequest');
+    Uri.parse('https://devvgate.vframework.in/vgateapi/processRequest');
 final processSessionRequest =
-   Uri.parse('https://vgate.vframework.in/vgateapi/processSessionRequest');
+   Uri.parse('https://devvgate.vframework.in/vgateapi/processSessionRequest');
 
-String mainbaseurl = "agentmembers.cinefo.com";
+String mainbaseurl = "agentsmember.cinefo.club";
 String agentbaseurlfordev = "agentsmember.cinefo.club";
 String agentbaseurlforproduction = "agentmembers.cinefo.com";
 
@@ -116,3 +115,4 @@ String setting__logo = 'assets/Setting_Union_Logo.png';
 // Global RouteObserver used by pages that implement RouteAware to refresh on navigation
 final RouteObserver<ModalRoute<void>> routeObserver =
     RouteObserver<ModalRoute<void>>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

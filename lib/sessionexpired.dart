@@ -10,6 +10,25 @@ class Sessionexpired extends StatefulWidget {
 }
 
 class _SessionexpiredState extends State<Sessionexpired> {
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,20 +37,37 @@ class _SessionexpiredState extends State<Sessionexpired> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/sessionexpired.jpg'),
+              Container(
+                width: getResponsiveWidth(context, 80),
+                height: getResponsiveHeight(context, 40),
+                child: Image.asset(
+                  'assets/sessionexpired.jpg',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              SizedBox(height: getResponsiveSpacing(context, 30)),
               GestureDetector(
                 onTap: () {
                   Navigator.push(context,
                       MaterialPageRoute(builder: (context) => Loginscreen()));
                 },
                 child: Container(
-                  width: 200,
-                  height: 50,
-                  decoration: BoxDecoration(border: Border.all()),
+                  width: getResponsiveWidth(context, 55),
+                  height: getResponsiveHeight(context, 7),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: getResponsiveSpacing(context, 1.5),
+                    ),
+                    borderRadius: BorderRadius.circular(
+                      getResponsiveSpacing(context, 8),
+                    ),
+                  ),
                   child: Center(
                       child: Text(
                     "please login again",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(
+                      fontSize: getResponsiveFontSize(context, 16),
+                    ),
                   )),
                 ),
               )

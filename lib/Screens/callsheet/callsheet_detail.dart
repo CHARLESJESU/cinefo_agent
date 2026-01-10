@@ -11,6 +11,25 @@ class CallsheetDetailScreen extends StatelessWidget {
   const CallsheetDetailScreen({Key? key, required this.callsheet})
       : super(key: key);
 
+  // Responsive helper methods
+  double getResponsiveWidth(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.width * (percentage / 100);
+  }
+
+  double getResponsiveHeight(BuildContext context, double percentage) {
+    return MediaQuery.of(context).size.height * (percentage / 100);
+  }
+
+  double getResponsiveFontSize(BuildContext context, double baseSize) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSize * (screenWidth / 375);
+  }
+
+  double getResponsiveSpacing(BuildContext context, double baseSpacing) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    return baseSpacing * (screenWidth / 375);
+  }
+
   // Method to update callsheet status (Pack Up functionality)
   Future<void> _updateCallsheetStatus(
       String callSheetNo, BuildContext context) async {
@@ -121,13 +140,18 @@ class CallsheetDetailScreen extends StatelessWidget {
         automaticallyImplyLeading: false, // Disable automatic back button
         title: Text(
           'Callsheet Details',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: getResponsiveFontSize(context, 18),
+          ),
         ),
         backgroundColor: const Color(0xFF2B5682),
         leading: IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.arrow_back,
             color: Colors.white,
+            size: getResponsiveFontSize(context, 24),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -135,20 +159,22 @@ class CallsheetDetailScreen extends StatelessWidget {
       backgroundColor: const Color.fromRGBO(247, 244, 244, 1),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(getResponsiveSpacing(context, 20)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: EdgeInsets.all(20),
+                padding: EdgeInsets.all(getResponsiveSpacing(context, 20)),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(
+                    getResponsiveSpacing(context, 20),
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
-                      blurRadius: 10,
-                      offset: Offset(0, 5),
+                      blurRadius: getResponsiveSpacing(context, 10),
+                      offset: Offset(0, getResponsiveSpacing(context, 5)),
                     ),
                   ],
                 ),
@@ -159,23 +185,27 @@ class CallsheetDetailScreen extends StatelessWidget {
                       child: Text(
                         Moviename ?? 'Unknown',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: getResponsiveFontSize(context, 24),
                           fontWeight: FontWeight.bold,
                           color: Color(0xFF2B5682),
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: getResponsiveSpacing(context, 20)),
                     Row(
                       children: [
                         Expanded(
                           child: Container(
-                            height: 70,
-                            padding: EdgeInsets.all(12),
+                            height: getResponsiveHeight(context, 9),
+                            padding: EdgeInsets.all(
+                              getResponsiveSpacing(context, 12),
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(
+                                getResponsiveSpacing(context, 10),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,7 +215,7 @@ class CallsheetDetailScreen extends StatelessWidget {
                                   "Date",
                                   style: TextStyle(
                                     color: Colors.grey[600],
-                                    fontSize: 12,
+                                    fontSize: getResponsiveFontSize(context, 12),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -193,7 +223,7 @@ class CallsheetDetailScreen extends StatelessWidget {
                                   createdAtDisplay,
                                   style: TextStyle(
                                     color: Color(0xFF2B5682),
-                                    fontSize: 12,
+                                    fontSize: getResponsiveFontSize(context, 12),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -201,14 +231,18 @@ class CallsheetDetailScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: getResponsiveSpacing(context, 12)),
                         Expanded(
                           child: Container(
-                            height: 70,
-                            padding: EdgeInsets.all(12),
+                            height: getResponsiveHeight(context, 9),
+                            padding: EdgeInsets.all(
+                              getResponsiveSpacing(context, 12),
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(
+                                getResponsiveSpacing(context, 10),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +252,7 @@ class CallsheetDetailScreen extends StatelessWidget {
                                   "Time",
                                   style: TextStyle(
                                     color: Colors.grey[600],
-                                    fontSize: 12,
+                                    fontSize: getResponsiveFontSize(context, 12),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -226,7 +260,7 @@ class CallsheetDetailScreen extends StatelessWidget {
                                   time ?? 'Unknown',
                                   style: TextStyle(
                                     color: Color(0xFF2B5682),
-                                    fontSize: 8,
+                                    fontSize: getResponsiveFontSize(context, 10),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -236,16 +270,20 @@ class CallsheetDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 15),
+                    SizedBox(height: getResponsiveSpacing(context, 15)),
                     Row(
                       children: [
                         Expanded(
                           child: Container(
-                            height: 70,
-                            padding: EdgeInsets.all(12),
+                            height: getResponsiveHeight(context, 9),
+                            padding: EdgeInsets.all(
+                              getResponsiveSpacing(context, 12),
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(
+                                getResponsiveSpacing(context, 10),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -255,7 +293,7 @@ class CallsheetDetailScreen extends StatelessWidget {
                                   "ID",
                                   style: TextStyle(
                                     color: Colors.grey[600],
-                                    fontSize: 12,
+                                    fontSize: getResponsiveFontSize(context, 12),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -265,7 +303,7 @@ class CallsheetDetailScreen extends StatelessWidget {
                                       : 'Unknown',
                                   style: TextStyle(
                                     color: Color(0xFF2B5682),
-                                    fontSize: 12,
+                                    fontSize: getResponsiveFontSize(context, 12),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -273,14 +311,18 @@ class CallsheetDetailScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        SizedBox(width: 12),
+                        SizedBox(width: getResponsiveSpacing(context, 12)),
                         Expanded(
                           child: Container(
-                            height: 100,
-                            padding: EdgeInsets.all(12),
+                            height: getResponsiveHeight(context, 13),
+                            padding: EdgeInsets.all(
+                              getResponsiveSpacing(context, 12),
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(
+                                getResponsiveSpacing(context, 10),
+                              ),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,25 +332,25 @@ class CallsheetDetailScreen extends StatelessWidget {
                                   "Location",
                                   style: TextStyle(
                                     color: Colors.grey[600],
-                                    fontSize: 12,
+                                    fontSize: getResponsiveFontSize(context, 12),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
                                 Builder(
                                   builder: (context) {
                                     final loc = location ?? 'Unknown';
-                                    double fontSize = 10;
+                                    double baseFontSize = 10;
                                     if (loc.length > 40) {
-                                      fontSize = 9;
+                                      baseFontSize = 9;
                                     }
                                     if (loc.length > 80) {
-                                      fontSize = 7;
+                                      baseFontSize = 7;
                                     }
                                     return Text(
                                       loc,
                                       style: TextStyle(
                                         color: Color(0xFF2B5682),
-                                        fontSize: fontSize,
+                                        fontSize: getResponsiveFontSize(context, baseFontSize),
                                         fontWeight: FontWeight.w600,
                                       ),
                                       maxLines: 3,
@@ -322,13 +364,17 @@ class CallsheetDetailScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 25),
+                    SizedBox(height: getResponsiveSpacing(context, 25)),
                     // Action buttons row with exact same functionality as offline screen
                     Container(
-                      padding: EdgeInsets.symmetric(vertical: 15),
+                      padding: EdgeInsets.symmetric(
+                        vertical: getResponsiveSpacing(context, 15),
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(15),
+                        borderRadius: BorderRadius.circular(
+                          getResponsiveSpacing(context, 15),
+                        ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -371,6 +417,7 @@ class CallsheetDetailScreen extends StatelessWidget {
                               }
                             },
                             child: _actionButton(
+                              context,
                               "In-time",
                               Icons.login,
                               AppColors.primaryLight,
@@ -412,6 +459,7 @@ class CallsheetDetailScreen extends StatelessWidget {
                               }
                             },
                             child: _actionButton(
+                              context,
                               "Out-time",
                               Icons.logout,
                               AppColors.primaryLight,
@@ -431,7 +479,7 @@ class CallsheetDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _actionButton(String title, IconData icon, Color color,
+  Widget _actionButton(BuildContext context, String title, IconData icon, Color color,
       {bool enabled = true}) {
     return Opacity(
       opacity: enabled ? 1.0 : 0.5, // Make disabled buttons semi-transparent
@@ -439,22 +487,24 @@ class CallsheetDetailScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: EdgeInsets.all(12),
+            padding: EdgeInsets.all(getResponsiveSpacing(context, 12)),
             decoration: BoxDecoration(
               color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(
+                getResponsiveSpacing(context, 12),
+              ),
             ),
             child: Icon(
               icon,
               color: color,
-              size: 30,
+              size: getResponsiveFontSize(context, 30),
             ),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: getResponsiveSpacing(context, 8)),
           Text(
             title,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: getResponsiveFontSize(context, 12),
               fontWeight: FontWeight.w600,
               color: enabled ? Colors.black87 : Colors.grey,
             ),
